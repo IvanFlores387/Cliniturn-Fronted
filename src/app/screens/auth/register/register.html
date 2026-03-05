@@ -1,0 +1,215 @@
+<div class="auth-container">
+  <div class="auth-card">
+    
+    <div class="auth-header">
+      <div class="icon-circle">
+        <lucide-icon name="user-plus"></lucide-icon>
+      </div>
+      <h2>Crear Cuenta</h2>
+      <p>Selecciona tu rol para registrarte en CliniTurn</p>
+    </div>
+
+    <div class="role-tabs">
+      <button 
+        [class.active]="activeTab === 'paciente'" 
+        (click)="setTab('paciente')">
+        Paciente
+      </button>
+      <button 
+        [class.active]="activeTab === 'medico'" 
+        (click)="setTab('medico')">
+        Médico
+      </button>
+      <button 
+        [class.active]="activeTab === 'admin'" 
+        (click)="setTab('admin')">
+        Administrador
+      </button>
+    </div>
+
+    <form *ngIf="activeTab === 'paciente'" [formGroup]="pacienteForm" (ngSubmit)="onSubmitPaciente()">
+      <div class="form-grid">
+        <div class="input-group">
+          <label for="pac-nombre">Nombre(s) *</label>
+          <div class="input-wrapper">
+            <lucide-icon name="user" class="input-icon"></lucide-icon>
+            <input id="pac-nombre" type="text" formControlName="nombre" placeholder="Juan">
+          </div>
+        </div>
+        <div class="input-group">
+          <label for="pac-apellidos">Apellido(s) *</label>
+          <div class="input-wrapper">
+            <lucide-icon name="user" class="input-icon"></lucide-icon>
+            <input id="pac-apellidos" type="text" formControlName="apellidos" placeholder="Pérez García">
+          </div>
+        </div>
+        <div class="input-group">
+          <label for="pac-matricula">Matrícula *</label>
+          <div class="input-wrapper">
+            <lucide-icon name="graduation-cap" class="input-icon"></lucide-icon>
+            <input id="pac-matricula" type="text" formControlName="matricula" placeholder="2021-0123">
+          </div>
+        </div>
+        <div class="input-group">
+          <label for="pac-carrera">Carrera *</label>
+          <div class="input-wrapper">
+            <lucide-icon name="book" class="input-icon"></lucide-icon>
+            <input id="pac-carrera" type="text" formControlName="carrera" placeholder="Ingeniería en Sistemas">
+          </div>
+        </div>
+        <div class="input-group">
+          <label for="pac-correo">Correo Electrónico *</label>
+          <div class="input-wrapper">
+            <lucide-icon name="mail" class="input-icon"></lucide-icon>
+            <input id="pac-correo" type="email" formControlName="correo" placeholder="tu-email@universidad.edu">
+          </div>
+        </div>
+        <div class="input-group">
+          <label for="pac-telefono">Teléfono *</label>
+          <div class="input-wrapper">
+            <lucide-icon name="phone" class="input-icon"></lucide-icon>
+            <input id="pac-telefono" type="tel" formControlName="telefono" placeholder="555-1234">
+          </div>
+        </div>
+        <div class="input-group">
+          <label for="pac-password">Contraseña *</label>
+          <div class="input-wrapper">
+            <lucide-icon name="lock" class="input-icon"></lucide-icon>
+            <input id="pac-password" type="password" formControlName="password" placeholder="Mínimo 6 caracteres">
+          </div>
+        </div>
+        <div class="input-group">
+          <label for="pac-confirm">Confirmar Contraseña *</label>
+          <div class="input-wrapper">
+            <lucide-icon name="lock" class="input-icon"></lucide-icon>
+            <input id="pac-confirm" type="password" formControlName="confirmPassword" placeholder="Confirmar contraseña">
+          </div>
+        </div>
+      </div>
+      <button type="submit" class="btn-primary" [disabled]="pacienteForm.invalid">Crear Cuenta de Paciente</button>
+    </form>
+
+    <form *ngIf="activeTab === 'medico'" [formGroup]="medicoForm" (ngSubmit)="onSubmitMedico()">
+      <div class="form-grid">
+        <div class="input-group">
+          <label for="med-nombre">Nombre(s) *</label>
+          <div class="input-wrapper">
+            <lucide-icon name="user" class="input-icon"></lucide-icon>
+            <input id="med-nombre" type="text" formControlName="nombre" placeholder="Dra. María">
+          </div>
+        </div>
+        <div class="input-group">
+          <label for="med-apellidos">Apellido(s) *</label>
+          <div class="input-wrapper">
+            <lucide-icon name="user" class="input-icon"></lucide-icon>
+            <input id="med-apellidos" type="text" formControlName="apellidos" placeholder="López">
+          </div>
+        </div>
+        <div class="input-group">
+          <label for="med-cedula">Cédula Profesional *</label>
+          <div class="input-wrapper">
+            <lucide-icon name="book" class="input-icon"></lucide-icon>
+            <input id="med-cedula" type="text" formControlName="cedula" placeholder="Ej. 12345678">
+          </div>
+        </div>
+        <div class="input-group">
+          <label for="med-especialidad">Especialidad *</label>
+          <div class="input-wrapper">
+            <lucide-icon name="zap" class="input-icon"></lucide-icon>
+            <input id="med-especialidad" type="text" formControlName="especialidad" placeholder="Nutrición / Psicología">
+          </div>
+        </div>
+        <div class="input-group">
+          <label for="med-correo">Correo Institucional *</label>
+          <div class="input-wrapper">
+            <lucide-icon name="mail" class="input-icon"></lucide-icon>
+            <input id="med-correo" type="email" formControlName="correo" placeholder="medico@universidad.edu">
+          </div>
+        </div>
+        <div class="input-group">
+          <label for="med-telefono">Teléfono *</label>
+          <div class="input-wrapper">
+            <lucide-icon name="phone" class="input-icon"></lucide-icon>
+            <input id="med-telefono" type="tel" formControlName="telefono" placeholder="555-1234">
+          </div>
+        </div>
+        <div class="input-group">
+          <label for="med-password">Contraseña *</label>
+          <div class="input-wrapper">
+            <lucide-icon name="lock" class="input-icon"></lucide-icon>
+            <input id="med-password" type="password" formControlName="password" placeholder="Mínimo 6 caracteres">
+          </div>
+        </div>
+        <div class="input-group">
+          <label for="med-confirm">Confirmar Contraseña *</label>
+          <div class="input-wrapper">
+            <lucide-icon name="lock" class="input-icon"></lucide-icon>
+            <input id="med-confirm" type="password" formControlName="confirmPassword" placeholder="Confirmar contraseña">
+          </div>
+        </div>
+      </div>
+      <button type="submit" class="btn-primary" [disabled]="medicoForm.invalid">Registrar Médico</button>
+    </form>
+
+    <form *ngIf="activeTab === 'admin'" [formGroup]="adminForm" (ngSubmit)="onSubmitAdmin()">
+      <div class="form-grid">
+        <div class="input-group">
+          <label for="adm-nombre">Nombre(s) *</label>
+          <div class="input-wrapper">
+            <lucide-icon name="user" class="input-icon"></lucide-icon>
+            <input id="adm-nombre" type="text" formControlName="nombre" placeholder="Admin">
+          </div>
+        </div>
+        <div class="input-group">
+          <label for="adm-apellidos">Apellido(s) *</label>
+          <div class="input-wrapper">
+            <lucide-icon name="user" class="input-icon"></lucide-icon>
+            <input id="adm-apellidos" type="text" formControlName="apellidos" placeholder="Principal">
+          </div>
+        </div>
+        <div class="input-group full-width" style="grid-column: 1 / -1;">
+          <label for="adm-codigo">Código de Autorización del Sistema *</label>
+          <div class="input-wrapper">
+            <lucide-icon name="shield" class="input-icon"></lucide-icon>
+            <input id="adm-codigo" type="password" formControlName="codigoAdmin" placeholder="Ingrese la clave maestra de acceso">
+          </div>
+        </div>
+        <div class="input-group">
+          <label for="adm-correo">Correo Administrativo *</label>
+          <div class="input-wrapper">
+            <lucide-icon name="mail" class="input-icon"></lucide-icon>
+            <input id="adm-correo" type="email" formControlName="correo" placeholder="admin@cliniturn.edu">
+          </div>
+        </div>
+        <div class="input-group">
+          <label for="adm-telefono">Teléfono *</label>
+          <div class="input-wrapper">
+            <lucide-icon name="phone" class="input-icon"></lucide-icon>
+            <input id="adm-telefono" type="tel" formControlName="telefono" placeholder="555-1234">
+          </div>
+        </div>
+        <div class="input-group">
+          <label for="adm-password">Contraseña *</label>
+          <div class="input-wrapper">
+            <lucide-icon name="lock" class="input-icon"></lucide-icon>
+            <input id="adm-password" type="password" formControlName="password" placeholder="Mínimo 6 caracteres">
+          </div>
+        </div>
+        <div class="input-group">
+          <label for="adm-confirm">Confirmar Contraseña *</label>
+          <div class="input-wrapper">
+            <lucide-icon name="lock" class="input-icon"></lucide-icon>
+            <input id="adm-confirm" type="password" formControlName="confirmPassword" placeholder="Confirmar contraseña">
+          </div>
+        </div>
+      </div>
+      <button type="submit" class="btn-primary" [disabled]="adminForm.invalid">Registrar Administrador</button>
+    </form>
+
+    <div class="auth-footer">
+      <p>¿Ya tienes una cuenta? <a (click)="goToLogin()">Inicia sesión aquí</a></p>
+      <a class="back-link" (click)="goHome()">← Volver al inicio</a>
+    </div>
+
+  </div>
+</div>
