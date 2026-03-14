@@ -1,0 +1,49 @@
+$footer-bg: #0f172a; // El tono oscuro de tu Figma
+$footer-text: #94a3b8;
+
+.main-footer {
+  background-color: $footer-bg;
+  color: white;
+  padding: 4rem 5% 2rem; // El 5% mantiene el margen lateral
+  box-sizing: border-box;
+
+  .footer-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 2rem;
+    padding-bottom: 2rem;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+  }
+
+  .footer-col {
+    h3 { margin-bottom: 1.5rem; font-size: 1.1rem; }
+    ul { list-style: none; padding: 0; }
+    li { 
+      margin-bottom: 0.8rem; 
+      color: $footer-text; 
+      display: flex; 
+      align-items: center; 
+      gap: 8px; 
+    }
+    a { color: $footer-text; text-decoration: none; cursor: pointer; &:hover { color: white; } }
+    
+    .footer-logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 1.5rem;
+      font-weight: 800;
+      margin-bottom: 1rem;
+      color: white;
+    }
+  }
+
+  .footer-bottom {
+    text-align: center;
+    padding-top: 2rem;
+    color: $footer-text;
+    font-size: 0.85rem;
+  }
+}

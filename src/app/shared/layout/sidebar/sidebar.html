@@ -1,0 +1,24 @@
+<aside class="sidebar">
+
+  <nav class="menu">
+    <a
+      *ngFor="let item of menu"
+      [routerLink]="item.route"
+      routerLinkActive="active"
+      class="menu-item"
+    >
+      <lucide-icon
+        [name]="item.icon"
+        class="icon">
+      </lucide-icon>
+
+      <span>{{ item.label }}</span>
+    </a>
+  </nav>
+
+  <div class="sidebar-footer">
+    <strong>Dr. Carlos Rodríguez</strong>
+    <small>Médico</small>
+  </div>
+
+</aside>

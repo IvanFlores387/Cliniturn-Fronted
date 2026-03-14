@@ -1,0 +1,302 @@
+// Variables de color basadas en tu diseño
+$primary-blue: #1d4ed8; // Azul principal
+$text-dark: #0f172a;
+$text-muted: #64748b;
+$bg-light: #f8fafc;
+$white: #ffffff;
+
+.landing-container {
+  font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  color: $text-dark;
+}
+
+// Botones globales para la landing
+button {
+  cursor: pointer;
+  font-weight: 600;
+  border-radius: 8px;
+  padding: 12px 24px;
+  font-size: 1rem;
+  transition: all 0.3s ease;
+  border: none;
+}
+
+.btn-primary-inverse {
+  background-color: $white;
+  color: $primary-blue;
+  &:hover { background-color: #f1f5f9; }
+}
+
+.btn-outline-light {
+  background-color: transparent;
+  color: $white;
+  border: 2px solid $white;
+  &:hover { background-color: rgba(255, 255, 255, 0.1); }
+}
+
+// 1. Hero Section
+.hero-section {
+  background-color: $primary-blue;
+  color: $white;
+  display: flex;
+  flex-direction: column;
+  padding: 4rem 2rem;
+  gap: 3rem;
+  align-items: center;
+
+  @media (min-width: 768px) {
+    flex-direction: row;
+    padding: 6rem 5rem;
+    justify-content: space-between;
+  }
+
+  .hero-content {
+    flex: 1;
+    max-width: 600px;
+
+    h1 {
+      font-size: 2.5rem;
+      margin-bottom: 1rem;
+      line-height: 1.2;
+      @media (min-width: 768px) { font-size: 3.5rem; }
+    }
+
+    p {
+      font-size: 1.1rem;
+      margin-bottom: 2rem;
+      opacity: 0.9;
+    }
+
+    .hero-buttons {
+      display: flex;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+  }
+
+  .hero-image {
+    flex: 1;
+    img {
+      width: 100%;
+      border-radius: 12px;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+    }
+  }
+}
+
+// Estilos compartidos para títulos de sección
+h2 {
+  text-align: center;
+  font-size: 2rem;
+  margin-bottom: 0.5rem;
+}
+
+.subtitle {
+  text-align: center;
+  color: $text-muted;
+  margin-bottom: 3rem;
+}
+
+// 2. Beneficios
+.benefits-section {
+  padding: 5rem 2rem;
+  background-color: $bg-light;
+
+  .benefits-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 2rem;
+    max-width: 1200px;
+    margin: 0 auto;
+
+    @media (min-width: 768px) {
+      grid-template-columns: repeat(2, 1fr);
+    }
+    @media (min-width: 1024px) {
+      grid-template-columns: repeat(4, 1fr);
+    }
+
+    .benefit-card {
+      background: $white;
+      padding: 2rem;
+      border-radius: 12px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+      
+      h3 { margin: 1rem 0; font-size: 1.2rem; }
+      p { color: $text-muted; font-size: 0.95rem; line-height: 1.5; }
+
+      .icon-wrapper {
+        width: 48px;
+        height: 48px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        
+        &.blue { background-color: #dbeafe; color: #1e40af; }   
+        &.green { background-color: #dcfce7; color: #15803d; }  
+        &.purple { background-color: #f3e8ff; color: #6b21a8; } 
+        &.red { background-color: #fee2e2; color: #b91c1c; }    
+      }
+    }
+  }
+}
+
+// 3. Pasos (¿Cómo funciona?)
+.steps-section {
+  padding: 5rem 2rem;
+  background-color: $white;
+
+  .steps-container {
+    display: flex;
+    flex-direction: column;
+    gap: 3rem;
+    max-width: 1000px;
+    margin: 0 auto;
+
+    @media (min-width: 768px) {
+      flex-direction: row;
+      justify-content: space-between;
+    }
+
+    .step-item {
+      text-align: center;
+      flex: 1;
+
+      .step-number {
+        width: 64px;
+        height: 64px;
+        background-color: $primary-blue;
+        color: $white;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+        font-weight: bold;
+        margin: 0 auto 1.5rem auto;
+      }
+
+      h3 { margin-bottom: 1rem; }
+      p { color: $text-muted; line-height: 1.5; }
+    }
+  }
+}
+
+// 4. Ubicación y Contacto
+.contact-section {
+  padding: 5rem 2rem;
+  background-color: $bg-light;
+  display: flex;
+  flex-direction: column;
+  gap: 3rem;
+  max-width: 1200px;
+  margin: 0 auto;
+
+  @media (min-width: 992px) {
+    flex-direction: row;
+    align-items: center;
+  }
+
+  .contact-info {
+    flex: 1;
+    h2 { text-align: left; margin-bottom: 2rem; }
+
+    .info-item {
+      display: flex;
+      gap: 1.5rem;
+      margin-bottom: 2rem;
+
+      h4 { margin-bottom: 0.5rem; color: $text-dark; }
+      p { color: $text-muted; line-height: 1.5; margin: 0; }
+
+      .icon-wrapper {
+        width: 40px;
+        height: 40px;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+
+        &.blue-light { background-color: #e0e7ff; color: #3730a3; }
+        &.green-light { background-color: #dcfce7; color: #15803d; }
+        &.purple-light { background-color: #f3e8ff; color: #6b21a8; }
+        &.red-light { background-color: #fee2e2; color: #b91c1c; }
+      }
+    }
+  }
+
+  .contact-image {
+    flex: 1;
+    img {
+      width: 100%;
+      border-radius: 12px;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+    }
+  }
+}
+
+// 5. CTA Final
+.final-cta {
+  background-color: $primary-blue;
+  color: $white;
+  text-align: center;
+  padding: 5rem 2rem;
+
+  h2 { margin-bottom: 1rem; color: $white; }
+  p { margin-bottom: 2rem; font-size: 1.1rem; opacity: 0.9; }
+}
+.ready-cta {
+  background-color: #1d4ed8; // Azul brillante
+  color: white;
+  text-align: center;
+  padding: 80px 20px;
+  margin: 0; // Crucial: Cero margen
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+
+  h2 { font-size: 2.5rem; font-weight: 700; }
+  .btn-white {
+    background: white; color: #1d4ed8;
+    padding: 12px 28px; border-radius: 8px; border: none;
+    font-weight: 700; cursor: pointer;
+  }
+}
+
+.landing-info-black {
+  background-color: #111827; // El negro/gris oscuro de Figma
+  color: white;
+  padding: 60px 5% 20px;
+  margin: 0; // Crucial: Cero margen
+
+  .info-grid {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 40px;
+    padding-bottom: 40px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  }
+
+  .logo-flex {
+    display: flex; align-items: center; gap: 10px;
+    font-size: 1.5rem; font-weight: 800; margin-bottom: 15px;
+  }
+
+  h3 { font-size: 1.1rem; margin-bottom: 20px; }
+  a { 
+    display: block; color: #94a3b8; margin-bottom: 10px; 
+    cursor: pointer; text-decoration: none;
+    &:hover { color: white; }
+  }
+  p { color: #94a3b8; line-height: 1.6; }
+
+  .copyright-bar {
+    text-align: center; padding-top: 20px;
+    color: #64748b; font-size: 0.85rem;
+  }
+}

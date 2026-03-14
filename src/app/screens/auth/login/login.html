@@ -1,0 +1,59 @@
+<div class="auth-container">
+  <div class="auth-card">
+    
+    <div class="auth-header">
+      <div class="icon-circle">
+        <lucide-icon name="log-in"></lucide-icon>
+      </div>
+      <h2>Iniciar Sesión</h2>
+      <p>Accede a tu cuenta de CliniTurn</p>
+    </div>
+
+    <div class="test-credentials">
+      <p class="test-title">Credenciales de Prueba:</p>
+      <ul>
+        <li><strong>Paciente:</strong> paciente&#64;universidad.edu / 123456</li>
+        <li><strong>Médico:</strong> medico&#64;universidad.edu / 123456</li>
+        <li><strong>Admin:</strong> admin&#64;universidad.edu / 123456</li>
+      </ul>
+    </div>
+
+    <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
+      <div class="input-group">
+        <label for="login-email">Correo Electrónico</label>
+        <div class="input-wrapper">
+          <lucide-icon name="mail" class="input-icon"></lucide-icon>
+          <input 
+            id="login-email" 
+            type="email" 
+            formControlName="correo" 
+            placeholder="tu-email&#64;universidad.edu"
+            required>
+        </div>
+      </div>
+
+      <div class="input-group">
+        <label for="login-pass">Contraseña</label>
+        <div class="input-wrapper">
+          <lucide-icon name="lock" class="input-icon"></lucide-icon>
+          <input 
+            id="login-pass" 
+            type="password" 
+            formControlName="password" 
+            placeholder="••••••••"
+            required>
+        </div>
+      </div>
+
+      <button type="submit" class="btn-primary" [disabled]="loginForm.invalid">
+        Iniciar Sesión
+      </button>
+    </form>
+
+    <div class="auth-footer">
+      <p>¿No tienes una cuenta? <a (click)="goToRegister()">Regístrate aquí</a></p>
+      <a class="back-link" (click)="goHome()">← Volver al inicio</a>
+    </div>
+
+  </div>
+</div>

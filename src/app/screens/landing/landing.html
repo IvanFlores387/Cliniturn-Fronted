@@ -1,0 +1,157 @@
+<div class="landing-container">
+  <section class="hero-section">
+    <div class="hero-content">
+      <h1>Sistema de Gestión de Citas Médicas Universitarias</h1>
+      <p>Agenda tus citas médicas de forma rápida, segura y eficiente. Tu salud es nuestra prioridad.</p>
+      <div class="hero-buttons">
+        <button class="btn-primary-inverse" (click)="goToRegister()">Registrarse Ahora</button>
+        <button class="btn-outline-light" (click)="goToLogin()">Iniciar Sesión</button>
+      </div>
+    </div>
+    <div class="hero-image">
+      <img src="assets/images/hero-clinic.jpg" alt="Consultorio CliniTurn">
+    </div>
+  </section>
+
+  <section class="benefits-section">
+    <h2>Beneficios del Servicio</h2>
+    <p class="subtitle">CliniTurn facilita el acceso a servicios médicos para toda la comunidad universitaria</p>
+    
+    <div class="benefits-grid">
+      <div class="benefit-card">
+        <div class="icon-wrapper blue">
+          <lucide-icon name="zap"></lucide-icon>
+        </div>
+        <h3>Rápido y Eficiente</h3>
+        <p>Agenda tu cita en menos de 2 minutos desde cualquier dispositivo</p>
+      </div>
+      <div class="benefit-card">
+        <div class="icon-wrapper green">
+          <lucide-icon name="calendar"></lucide-icon>
+        </div>
+        <h3>Disponibilidad 24/7</h3>
+        <p>Consulta y gestiona tus citas en cualquier momento del día</p>
+      </div>
+      <div class="benefit-card">
+        <div class="icon-wrapper purple">
+          <lucide-icon name="users"></lucide-icon>
+        </div>
+        <h3>Múltiples Especialidades</h3>
+        <p>Acceso a medicina general, psicología, odontología, nutrición y más</p>
+      </div>
+      <div class="benefit-card">
+        <div class="icon-wrapper red">
+          <lucide-icon name="shield"></lucide-icon>
+        </div>
+        <h3>Seguro y Confiable</h3>
+        <p>Tus datos médicos protegidos con los más altos estándares de seguridad</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="steps-section">
+    <h2>¿Cómo Funciona?</h2>
+    <p class="subtitle">Agenda tu cita en 3 simples pasos</p>
+    
+    <div class="steps-container">
+      <div class="step-item">
+        <div class="step-number">1</div>
+        <h3>Regístrate</h3>
+        <p>Crea tu cuenta con tu matrícula universitaria y datos personales</p>
+      </div>
+      <div class="step-item">
+        <div class="step-number">2</div>
+        <h3>Selecciona</h3>
+        <p>Elige la especialidad, médico, fecha y hora que mejor te convenga</p>
+      </div>
+      <div class="step-item">
+        <div class="step-number">3</div>
+        <h3>Confirma</h3>
+        <p>Recibe la confirmación y asiste a tu cita en el consultorio indicado</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="contact-section">
+    <div class="contact-info">
+      <h2>Ubicación y Contacto</h2>
+      
+      <div class="info-item">
+        <div class="icon-wrapper blue-light">
+          <lucide-icon name="map-pin"></lucide-icon>
+        </div>
+        <div>
+          <h4>Dirección</h4>
+          <p>Edificio Médico Principal<br>Campus Universitario Central<br>Ciudad Universitaria, CP 04510</p>
+        </div>
+      </div>
+
+      <div class="info-item">
+        <div class="icon-wrapper green-light">
+          <lucide-icon name="clock"></lucide-icon>
+        </div>
+        <div>
+          <h4>Horario de Atención</h4>
+          <p>Lunes a Viernes: 8:00 AM - 6:00 PM<br>Sábados: 9:00 AM - 2:00 PM<br>Domingos: Cerrado</p>
+        </div>
+      </div>
+
+      <div class="info-item">
+        <div class="icon-wrapper purple-light">
+          <lucide-icon name="phone"></lucide-icon>
+        </div>
+        <div>
+          <h4>Teléfono</h4>
+          <p>(55) 5555-1234<br>Ext. 4567</p>
+        </div>
+      </div>
+
+      <div class="info-item">
+        <div class="icon-wrapper red-light">
+          <lucide-icon name="mail"></lucide-icon>
+        </div>
+        <div>
+          <h4>Email</h4>
+          <p>contacto&#64;cliniturn.universidad.edu<br>soporte&#64;cliniturn.universidad.edu</p>
+        </div>
+      </div>
+    </div>
+    
+    <div class="contact-image">
+      <img src="assets/images/building.jpg" alt="Edificio Universitario">
+    </div>
+  </section>
+
+  <section class="final-cta">
+    <h2>¿Listo para comenzar?</h2>
+    <p>Únete a cientos de estudiantes que ya gestionan sus citas médicas con CliniTurn</p>
+    <button class="btn-primary-inverse" (click)="goToRegister()">Crear Cuenta Gratis</button>
+  </section>
+</div>
+<section class="landing-info-black">
+  <div class="info-grid">
+    <div class="brand-col">
+      <div class="logo-flex">
+        <lucide-icon name="calendar"></lucide-icon>
+        <span>CliniTurn</span>
+      </div>
+      <p>Sistema de gestión de citas médicas para el consultorio universitario.</p>
+    </div>
+
+    <div class="links-col">
+      <h3>Enlaces</h3>
+      <a (click)="navigateTo('/auth/login')">Iniciar Sesión</a>
+      <a (click)="navigateTo('/auth/register')">Registrarse</a>
+    </div>
+
+    <div class="contact-col">
+      <h3>Contacto</h3>
+      <p>(55) 5555-1234</p>
+      <p>contacto&#64;cliniturn.universidad.edu</p>
+    </div>
+  </div>
+
+  <div class="copyright-bar">
+    <p>© 2026 CliniTurn. Universidad. Todos los derechos reservados.</p>
+  </div>
+</section>
