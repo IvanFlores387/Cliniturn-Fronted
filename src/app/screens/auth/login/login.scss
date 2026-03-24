@@ -6,7 +6,7 @@ $bg-color: #eef2ff;
 $white: #ffffff;
 
 * {
-  box-sizing: border-box; 
+  box-sizing: border-box;
 }
 
 .auth-container {
@@ -73,18 +73,36 @@ $white: #ffffff;
 
 .input-group {
   margin-bottom: 1.5rem;
-  label { display: block; font-size: 0.9rem; font-weight: 600; margin-bottom: 0.5rem; }
-  
+
+  label {
+    display: block;
+    font-size: 0.9rem;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+  }
+
   .input-wrapper {
     position: relative;
-    .input-icon { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: $text-muted; width: 18px; }
+
+    .input-icon {
+      position: absolute;
+      left: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: $text-muted;
+      width: 18px;
+    }
+
     input {
       width: 100%;
       padding: 12px 12px 12px 40px;
       border: 1px solid $border-color;
       border-radius: 8px;
       outline: none;
-      &:focus { border-color: $primary-blue; }
+
+      &:focus {
+        border-color: $primary-blue;
+      }
     }
   }
 }
@@ -99,11 +117,44 @@ $white: #ffffff;
   font-weight: 600;
   cursor: pointer;
   margin-bottom: 1.5rem;
-  &:disabled { background-color: #94a3b8; }
+
+  &:disabled {
+    background-color: #94a3b8;
+    cursor: not-allowed;
+  }
+}
+
+/* MENSAJE DE ERROR */
+.auth-error {
+  margin-top: 1rem;
+  padding: 0.85rem 1rem;
+  border-radius: 12px;
+  border: 1px solid #fecaca;
+  background: #fef2f2;
+  color: #b91c1c;
+  font-size: 0.95rem;
+  text-align: center;
 }
 
 .auth-footer {
   text-align: center;
-  p { font-size: 0.9rem; color: $text-muted; a { color: $primary-blue; font-weight: 600; cursor: pointer; } }
-  .back-link { display: block; margin-top: 1rem; font-size: 0.85rem; color: $text-muted; cursor: pointer; }
+
+  p {
+    font-size: 0.9rem;
+    color: $text-muted;
+
+    a {
+      color: $primary-blue;
+      font-weight: 600;
+      cursor: pointer;
+    }
+  }
+
+  .back-link {
+    display: block;
+    margin-top: 1rem;
+    font-size: 0.85rem;
+    color: $text-muted;
+    cursor: pointer;
+  }
 }

@@ -1,10 +1,46 @@
-import { ApplicationConfig, provideBrowserGlobalErrorListeners, provideZonelessChangeDetection, importProvidersFrom } from '@angular/core';
+import {
+  ApplicationConfig,
+  provideBrowserGlobalErrorListeners,
+  provideZonelessChangeDetection,
+  importProvidersFrom
+} from '@angular/core';
 import { provideRouter } from '@angular/router';
 import { provideClientHydration, withEventReplay } from '@angular/platform-browser';
+import { provideHttpClient, withInterceptors } from '@angular/common/http';
 
 import { routes } from './app.routes';
+import { authInterceptor } from './core/interceptors/auth.interceptor';
 
-import { LucideAngularModule,Zap, Calendar, Users, Shield, MapPin, Clock, Phone, Mail, LayoutDashboard, FileText, UserPlus,GraduationCap,Book,Lock } from 'lucide-angular';
+import {
+  LucideAngularModule,
+  Zap,
+  Calendar,
+  Users,
+  Shield,
+  MapPin,
+  Clock,
+  Phone,
+  Mail,
+  LayoutDashboard,
+  FileText,
+  UserPlus,
+  GraduationCap,
+  Book,
+  Lock,
+  Menu,
+  LogOut,
+  User,
+  Stethoscope,
+  ClipboardList,
+  Building2,
+  TrendingUp,
+  CheckCircle2,
+  CircleAlert,
+  BadgePlus,
+  Activity,
+  CalendarDays,
+  NotebookPen
+} from 'lucide-angular';
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -12,6 +48,7 @@ export const appConfig: ApplicationConfig = {
     provideZonelessChangeDetection(),
     provideRouter(routes),
     provideClientHydration(withEventReplay()),
+    provideHttpClient(withInterceptors([authInterceptor])),
 
     importProvidersFrom(
       LucideAngularModule.pick({
@@ -21,7 +58,27 @@ export const appConfig: ApplicationConfig = {
         Zap,
         Users,
         Shield,
-        MapPin,Clock,Phone,Mail,UserPlus,GraduationCap,Book,Lock
+        MapPin,
+        Clock,
+        Phone,
+        Mail,
+        UserPlus,
+        GraduationCap,
+        Book,
+        Lock,
+        Menu,
+        LogOut,
+        User,
+        Stethoscope,
+        ClipboardList,
+        Building2,
+        TrendingUp,
+        CheckCircle2,
+        CircleAlert,
+        BadgePlus,
+        Activity,
+        CalendarDays,
+        NotebookPen
       })
     )
   ]

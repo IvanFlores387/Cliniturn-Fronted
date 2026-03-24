@@ -1,6 +1,6 @@
 <div class="auth-container">
   <div class="auth-card">
-    
+
     <div class="auth-header">
       <div class="icon-circle">
         <lucide-icon name="log-in"></lucide-icon>
@@ -19,14 +19,15 @@
     </div>
 
     <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
+
       <div class="input-group">
         <label for="login-email">Correo Electrónico</label>
         <div class="input-wrapper">
           <lucide-icon name="mail" class="input-icon"></lucide-icon>
-          <input 
-            id="login-email" 
-            type="email" 
-            formControlName="correo" 
+          <input
+            id="login-email"
+            type="email"
+            formControlName="correo"
             placeholder="tu-email&#64;universidad.edu"
             required>
         </div>
@@ -36,10 +37,10 @@
         <label for="login-pass">Contraseña</label>
         <div class="input-wrapper">
           <lucide-icon name="lock" class="input-icon"></lucide-icon>
-          <input 
-            id="login-pass" 
-            type="password" 
-            formControlName="password" 
+          <input
+            id="login-pass"
+            type="password"
+            formControlName="password"
             placeholder="••••••••"
             required>
         </div>
@@ -48,6 +49,14 @@
       <button type="submit" class="btn-primary" [disabled]="loginForm.invalid">
         Iniciar Sesión
       </button>
+
+      <!-- MENSAJE DE ERROR -->
+      @if (errorMessage()) {
+        <div class="auth-error">
+          {{ errorMessage() }}
+        </div>
+      }
+
     </form>
 
     <div class="auth-footer">

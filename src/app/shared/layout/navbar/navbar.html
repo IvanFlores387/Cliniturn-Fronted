@@ -1,3 +1,18 @@
 <header class="navbar">
-  <h2>CliniTurn</h2>
+  <div class="navbar__brand">
+    <lucide-icon name="calendar-days" class="brand-icon"></lucide-icon>
+    <span>CliniTurn</span>
+  </div>
+
+  <div class="navbar__actions">
+    <div class="navbar__user">
+      <strong>{{ userName }}</strong>
+      <small>{{ roleLabel }}</small>
+    </div>
+
+    <button type="button" class="logout-btn" (click)="logout()">
+      <lucide-icon name="log-out"></lucide-icon>
+      <span>Cerrar Sesión</span>
+    </button>
+  </div>
 </header>

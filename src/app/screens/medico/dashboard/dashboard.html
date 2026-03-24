@@ -1,1 +1,33 @@
-<p>dashboard works!</p>
+<section class="dashboard-page">
+  <div class="page-header">
+    <p class="breadcrumb">Dashboard</p>
+    <h1>Bienvenido, Dr. Carlos Rodríguez</h1>
+    <p class="subtitle">Medicina General - Cédula: 12345678</p>
+  </div>
+
+  <div class="stats-grid">
+    <article class="stat-card" *ngFor="let stat of stats" [ngClass]="stat.tone">
+      <div>
+        <p>{{ stat.label }}</p>
+        <h3>{{ stat.value }}</h3>
+      </div>
+      <lucide-icon [name]="stat.icon"></lucide-icon>
+    </article>
+  </div>
+
+  <section class="section-block">
+    <h2>Citas de Hoy</h2>
+    <div class="empty-state">
+      <lucide-icon name="calendar-days"></lucide-icon>
+      <p>No tienes citas programadas para hoy</p>
+    </div>
+  </section>
+
+  <section class="section-block">
+    <h2>Próximas Citas</h2>
+    <div class="empty-state">
+      <lucide-icon name="calendar-days"></lucide-icon>
+      <p>No hay citas próximas</p>
+    </div>
+  </section>
+</section>

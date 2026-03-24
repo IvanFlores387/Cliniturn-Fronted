@@ -1,1 +1,61 @@
-<p>dashboard works!</p>
+<section class="dashboard-page">
+  <div class="page-header">
+    <p class="breadcrumb">Dashboard</p>
+    <h1>Panel de Administración</h1>
+    <p class="subtitle">Vista general del sistema CliniTurn</p>
+  </div>
+
+  <div class="stats-grid">
+    <article class="stat-card" *ngFor="let stat of stats" [ngClass]="stat.tone">
+      <div>
+        <p>{{ stat.label }}</p>
+        <h3>{{ stat.value }}</h3>
+      </div>
+      <lucide-icon [name]="stat.icon"></lucide-icon>
+    </article>
+  </div>
+
+  <div class="shortcuts-grid">
+    <article class="shortcut-card" *ngFor="let item of shortcuts" [ngClass]="item.tone">
+      <div class="shortcut-top">
+        <lucide-icon [name]="item.icon"></lucide-icon>
+        <strong *ngIf="item.value !== null">{{ item.value }}</strong>
+      </div>
+
+      <h3>{{ item.title }}</h3>
+      <p>{{ item.description }}</p>
+    </article>
+  </div>
+
+  <div class="charts-grid">
+    <section class="chart-card">
+      <h2>Citas por Especialidad</h2>
+      <div class="chart-placeholder pie-placeholder">
+        <div class="fake-pie"></div>
+        <div class="legend">
+          <span>Medicina General 50%</span>
+          <span>Psicología 25%</span>
+          <span>Odontología 25%</span>
+        </div>
+      </div>
+    </section>
+
+    <section class="chart-card">
+      <h2>Tendencia Semanal de Citas</h2>
+      <div class="chart-placeholder line-placeholder">
+        <div class="fake-line"></div>
+      </div>
+    </section>
+  </div>
+
+  <section class="section-block">
+    <h2>Resumen de Estados de Citas</h2>
+
+    <div class="summary-grid">
+      <article class="summary-card" *ngFor="let item of summary" [ngClass]="item.tone">
+        <span>{{ item.label }}</span>
+        <strong>{{ item.value }}</strong>
+      </article>
+    </div>
+  </section>
+</section>

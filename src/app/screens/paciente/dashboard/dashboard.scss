@@ -1,0 +1,154 @@
+.dashboard-page {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.page-header {
+  h1 {
+    margin: 0.25rem 0;
+    font-size: clamp(1.8rem, 2vw, 2.3rem);
+    color: #0f172a;
+  }
+
+  .subtitle,
+  .breadcrumb {
+    color: #64748b;
+    margin: 0;
+  }
+
+  .breadcrumb {
+    font-size: 0.9rem;
+  }
+}
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+.stat-card {
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 18px;
+  padding: 1.2rem 1.25rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  p {
+    margin: 0 0 0.35rem;
+    color: #64748b;
+    font-size: 0.95rem;
+  }
+
+  h3 {
+    margin: 0;
+    font-size: 2rem;
+    color: #0f172a;
+  }
+}
+
+.action-row {
+  display: flex;
+}
+
+.primary-btn {
+  background: #1d4ed8;
+  color: #fff;
+  border: 0;
+  border-radius: 12px;
+  padding: 0.9rem 1.15rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+}
+
+.section-block {
+  h2 {
+    margin: 0 0 1rem;
+    color: #0f172a;
+  }
+}
+
+.cards-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+.appointment-card {
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 18px;
+  padding: 1.2rem;
+
+  ul {
+    list-style: none;
+    padding: 0;
+    margin: 1rem 0 0;
+    display: grid;
+    gap: 0.55rem;
+    color: #475569;
+  }
+}
+
+.card-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+
+  h3 {
+    margin: 0;
+    color: #0f172a;
+  }
+}
+
+.badge {
+  font-size: 0.82rem;
+  padding: 0.4rem 0.75rem;
+  border-radius: 999px;
+  font-weight: 600;
+}
+
+.blue { border-color: #bfdbfe; }
+.yellow { border-color: #fde68a; }
+.green { border-color: #bbf7d0; }
+.purple { border-color: #ddd6fe; }
+.red { border-color: #fecaca; }
+
+.badge.green { background: #dcfce7; color: #166534; }
+.badge.yellow { background: #fef9c3; color: #a16207; }
+.badge.red { background: #fee2e2; color: #b91c1c; }
+.badge.blue { background: #dbeafe; color: #1d4ed8; }
+
+.cancel-box {
+  margin-top: 1rem;
+  border: 1px solid #fecaca;
+  background: #fef2f2;
+  color: #b91c1c;
+  border-radius: 12px;
+  padding: 0.85rem 1rem;
+}
+
+@media (max-width: 1100px) {
+  .stats-grid,
+  .cards-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 640px) {
+  .stats-grid,
+  .cards-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .card-top {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}

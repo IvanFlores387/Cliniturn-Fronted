@@ -1,1 +1,72 @@
-<p>dashboard works!</p>
+<section class="dashboard-page">
+  <div class="page-header">
+    <div>
+      <p class="breadcrumb">Dashboard</p>
+      <h1>Bienvenido, María</h1>
+      <p class="subtitle">Aquí puedes ver y gestionar tus citas médicas</p>
+    </div>
+  </div>
+
+  <div class="stats-grid">
+    <article class="stat-card" *ngFor="let stat of stats" [ngClass]="stat.tone">
+      <div>
+        <p>{{ stat.label }}</p>
+        <h3>{{ stat.value }}</h3>
+      </div>
+      <lucide-icon [name]="stat.icon"></lucide-icon>
+    </article>
+  </div>
+
+  <div class="action-row">
+    <button class="primary-btn">
+      <lucide-icon name="badge-plus"></lucide-icon>
+      Agendar Nueva Cita
+    </button>
+  </div>
+
+  <section class="section-block">
+    <h2>Próximas Citas</h2>
+
+    <div class="cards-grid">
+      <article class="appointment-card" *ngFor="let item of upcomingAppointments">
+        <div class="card-top">
+          <h3>{{ item.especialidad }}</h3>
+          <span class="badge" [ngClass]="item.tone">{{ item.estado }}</span>
+        </div>
+
+        <ul>
+          <li><strong>Médico:</strong> {{ item.medico }}</li>
+          <li><strong>Fecha:</strong> {{ item.fecha }}</li>
+          <li><strong>Hora:</strong> {{ item.hora }}</li>
+          <li><strong>Consultorio:</strong> {{ item.consultorio }}</li>
+          <li><strong>Motivo:</strong> {{ item.motivo }}</li>
+        </ul>
+      </article>
+    </div>
+  </section>
+
+  <section class="section-block">
+    <h2>Historial de Citas</h2>
+
+    <div class="cards-grid">
+      <article class="appointment-card" *ngFor="let item of historyAppointments">
+        <div class="card-top">
+          <h3>{{ item.especialidad }}</h3>
+          <span class="badge" [ngClass]="item.tone">{{ item.estado }}</span>
+        </div>
+
+        <ul>
+          <li><strong>Médico:</strong> {{ item.medico }}</li>
+          <li><strong>Fecha:</strong> {{ item.fecha }}</li>
+          <li><strong>Hora:</strong> {{ item.hora }}</li>
+          <li><strong>Consultorio:</strong> {{ item.consultorio }}</li>
+          <li><strong>Motivo:</strong> {{ item.motivo }}</li>
+        </ul>
+
+        <div class="cancel-box" *ngIf="item.cancelacion">
+          <strong>Motivo de cancelación:</strong> {{ item.cancelacion }}
+        </div>
+      </article>
+    </div>
+  </section>
+</section>
