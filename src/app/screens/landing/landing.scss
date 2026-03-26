@@ -1,4 +1,4 @@
-// Variables de color basadas en tu diseño
+
 $primary-blue: #1d4ed8; // Azul principal
 $text-dark: #0f172a;
 $text-muted: #64748b;
@@ -24,14 +24,20 @@ button {
 .btn-primary-inverse {
   background-color: $white;
   color: $primary-blue;
-  &:hover { background-color: #f1f5f9; }
+
+  &:hover {
+    background-color: #f1f5f9;
+  }
 }
 
 .btn-outline-light {
   background-color: transparent;
   color: $white;
   border: 2px solid $white;
-  &:hover { background-color: rgba(255, 255, 255, 0.1); }
+
+  &:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+  }
 }
 
 // 1. Hero Section
@@ -58,7 +64,10 @@ button {
       font-size: 2.5rem;
       margin-bottom: 1rem;
       line-height: 1.2;
-      @media (min-width: 768px) { font-size: 3.5rem; }
+
+      @media (min-width: 768px) {
+        font-size: 3.5rem;
+      }
     }
 
     p {
@@ -76,10 +85,17 @@ button {
 
   .hero-image {
     flex: 1;
+    display: flex;
+    justify-content: center;
+
     img {
       width: 100%;
-      border-radius: 12px;
+      max-width: 630px;
+      height: 410px;
+      object-fit: cover;
+      border-radius: 16px;
       box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+      display: block;
     }
   }
 }
@@ -112,6 +128,7 @@ h2 {
     @media (min-width: 768px) {
       grid-template-columns: repeat(2, 1fr);
     }
+
     @media (min-width: 1024px) {
       grid-template-columns: repeat(4, 1fr);
     }
@@ -121,9 +138,17 @@ h2 {
       padding: 2rem;
       border-radius: 12px;
       box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
-      
-      h3 { margin: 1rem 0; font-size: 1.2rem; }
-      p { color: $text-muted; font-size: 0.95rem; line-height: 1.5; }
+
+      h3 {
+        margin: 1rem 0;
+        font-size: 1.2rem;
+      }
+
+      p {
+        color: $text-muted;
+        font-size: 0.95rem;
+        line-height: 1.5;
+      }
 
       .icon-wrapper {
         width: 48px;
@@ -132,11 +157,26 @@ h2 {
         display: flex;
         align-items: center;
         justify-content: center;
-        
-        &.blue { background-color: #dbeafe; color: #1e40af; }   
-        &.green { background-color: #dcfce7; color: #15803d; }  
-        &.purple { background-color: #f3e8ff; color: #6b21a8; } 
-        &.red { background-color: #fee2e2; color: #b91c1c; }    
+
+        &.blue {
+          background-color: #dbeafe;
+          color: #1e40af;
+        }
+
+        &.green {
+          background-color: #dcfce7;
+          color: #15803d;
+        }
+
+        &.purple {
+          background-color: #f3e8ff;
+          color: #6b21a8;
+        }
+
+        &.red {
+          background-color: #fee2e2;
+          color: #b91c1c;
+        }
       }
     }
   }
@@ -177,8 +217,14 @@ h2 {
         margin: 0 auto 1.5rem auto;
       }
 
-      h3 { margin-bottom: 1rem; }
-      p { color: $text-muted; line-height: 1.5; }
+      h3 {
+        margin-bottom: 1rem;
+      }
+
+      p {
+        color: $text-muted;
+        line-height: 1.5;
+      }
     }
   }
 }
@@ -200,15 +246,27 @@ h2 {
 
   .contact-info {
     flex: 1;
-    h2 { text-align: left; margin-bottom: 2rem; }
+
+    h2 {
+      text-align: left;
+      margin-bottom: 2rem;
+    }
 
     .info-item {
       display: flex;
       gap: 1.5rem;
       margin-bottom: 2rem;
 
-      h4 { margin-bottom: 0.5rem; color: $text-dark; }
-      p { color: $text-muted; line-height: 1.5; margin: 0; }
+      h4 {
+        margin-bottom: 0.5rem;
+        color: $text-dark;
+      }
+
+      p {
+        color: $text-muted;
+        line-height: 1.5;
+        margin: 0;
+      }
 
       .icon-wrapper {
         width: 40px;
@@ -219,20 +277,42 @@ h2 {
         justify-content: center;
         flex-shrink: 0;
 
-        &.blue-light { background-color: #e0e7ff; color: #3730a3; }
-        &.green-light { background-color: #dcfce7; color: #15803d; }
-        &.purple-light { background-color: #f3e8ff; color: #6b21a8; }
-        &.red-light { background-color: #fee2e2; color: #b91c1c; }
+        &.blue-light {
+          background-color: #e0e7ff;
+          color: #3730a3;
+        }
+
+        &.green-light {
+          background-color: #dcfce7;
+          color: #15803d;
+        }
+
+        &.purple-light {
+          background-color: #f3e8ff;
+          color: #6b21a8;
+        }
+
+        &.red-light {
+          background-color: #fee2e2;
+          color: #b91c1c;
+        }
       }
     }
   }
 
   .contact-image {
     flex: 1;
+    display: flex;
+    justify-content: center;
+
     img {
       width: 100%;
-      border-radius: 12px;
-      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+      max-width: 470px;
+      height: 650px;
+      object-fit: cover;
+      border-radius: 16px;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.12);
+      display: block;
     }
   }
 }
@@ -244,9 +324,18 @@ h2 {
   text-align: center;
   padding: 5rem 2rem;
 
-  h2 { margin-bottom: 1rem; color: $white; }
-  p { margin-bottom: 2rem; font-size: 1.1rem; opacity: 0.9; }
+  h2 {
+    margin-bottom: 1rem;
+    color: $white;
+  }
+
+  p {
+    margin-bottom: 2rem;
+    font-size: 1.1rem;
+    opacity: 0.9;
+  }
 }
+
 .ready-cta {
   background-color: #1d4ed8; // Azul brillante
   color: white;
@@ -258,11 +347,19 @@ h2 {
   align-items: center;
   gap: 20px;
 
-  h2 { font-size: 2.5rem; font-weight: 700; }
+  h2 {
+    font-size: 2.5rem;
+    font-weight: 700;
+  }
+
   .btn-white {
-    background: white; color: #1d4ed8;
-    padding: 12px 28px; border-radius: 8px; border: none;
-    font-weight: 700; cursor: pointer;
+    background: white;
+    color: #1d4ed8;
+    padding: 12px 28px;
+    border-radius: 8px;
+    border: none;
+    font-weight: 700;
+    cursor: pointer;
   }
 }
 
@@ -283,20 +380,40 @@ h2 {
   }
 
   .logo-flex {
-    display: flex; align-items: center; gap: 10px;
-    font-size: 1.5rem; font-weight: 800; margin-bottom: 15px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 1.5rem;
+    font-weight: 800;
+    margin-bottom: 15px;
   }
 
-  h3 { font-size: 1.1rem; margin-bottom: 20px; }
-  a { 
-    display: block; color: #94a3b8; margin-bottom: 10px; 
-    cursor: pointer; text-decoration: none;
-    &:hover { color: white; }
+  h3 {
+    font-size: 1.1rem;
+    margin-bottom: 20px;
   }
-  p { color: #94a3b8; line-height: 1.6; }
+
+  a {
+    display: block;
+    color: #94a3b8;
+    margin-bottom: 10px;
+    cursor: pointer;
+    text-decoration: none;
+
+    &:hover {
+      color: white;
+    }
+  }
+
+  p {
+    color: #94a3b8;
+    line-height: 1.6;
+  }
 
   .copyright-bar {
-    text-align: center; padding-top: 20px;
-    color: #64748b; font-size: 0.85rem;
+    text-align: center;
+    padding-top: 20px;
+    color: #64748b;
+    font-size: 0.85rem;
   }
 }

@@ -9,15 +9,6 @@
       <p>Accede a tu cuenta de CliniTurn</p>
     </div>
 
-    <div class="test-credentials">
-      <p class="test-title">Credenciales de Prueba:</p>
-      <ul>
-        <li><strong>Paciente:</strong> paciente&#64;universidad.edu / 123456</li>
-        <li><strong>Médico:</strong> medico&#64;universidad.edu / 123456</li>
-        <li><strong>Admin:</strong> admin&#64;universidad.edu / 123456</li>
-      </ul>
-    </div>
-
     <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
 
       <div class="input-group">
@@ -28,7 +19,7 @@
             id="login-email"
             type="email"
             formControlName="correo"
-            placeholder="tu-email&#64;universidad.edu"
+            placeholder="tu-email@universidad.edu"
             required>
         </div>
       </div>
@@ -46,11 +37,10 @@
         </div>
       </div>
 
-      <button type="submit" class="btn-primary" [disabled]="loginForm.invalid">
+      <button type="submit" class="btn-primary" [disabled]="loginForm.invalid || isSubmitting()">
         Iniciar Sesión
       </button>
 
-      <!-- MENSAJE DE ERROR -->
       @if (errorMessage()) {
         <div class="auth-error">
           {{ errorMessage() }}

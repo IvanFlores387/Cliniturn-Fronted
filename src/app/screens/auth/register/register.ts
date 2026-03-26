@@ -104,9 +104,9 @@ export class RegisterComponent implements OnInit {
       matricula: value.matricula,
       carrera: value.carrera
     }).subscribe({
-      next: (user) => {
+      next: () => {
         this.isSubmitting.set(false);
-        this.authService.redirectByRole(user.role);
+        this.router.navigate(['/auth/login']);
       },
       error: (error) => {
         this.isSubmitting.set(false);
@@ -136,9 +136,9 @@ export class RegisterComponent implements OnInit {
       cedula: value.cedula,
       especialidad: value.especialidad
     }).subscribe({
-      next: (user) => {
+      next: () => {
         this.isSubmitting.set(false);
-        this.authService.redirectByRole(user.role);
+        this.router.navigate(['/auth/login']);
       },
       error: (error) => {
         this.isSubmitting.set(false);
@@ -167,9 +167,9 @@ export class RegisterComponent implements OnInit {
       apellidos: value.apellidos,
       codigoAdmin: value.codigoAdmin
     }).subscribe({
-      next: (user) => {
+      next: () => {
         this.isSubmitting.set(false);
-        this.authService.redirectByRole(user.role);
+        this.router.navigate(['/auth/login']);
       },
       error: (error) => {
         this.isSubmitting.set(false);

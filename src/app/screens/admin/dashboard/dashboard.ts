@@ -1,6 +1,7 @@
-import { Component } from '@angular/core';
+import { Component, computed, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { LucideAngularModule } from 'lucide-angular';
+import { AuthService } from '../../../services/auth.service';
 
 @Component({
   selector: 'app-dashboard',
@@ -10,6 +11,11 @@ import { LucideAngularModule } from 'lucide-angular';
   styleUrl: './dashboard.scss'
 })
 export class Dashboard {
+  private readonly authService = inject(AuthService);
+
+  readonly currentUser = computed(() => this.authService.user());
+  readonly adminName = computed(() => this.currentUser()?.nombre ?? 'Administrador');
+
   stats = [
     { label: 'Total de Citas', value: 4, icon: 'calendar', tone: 'blue' },
     { label: 'Citas Pendientes', value: 1, icon: 'circle-alert', tone: 'yellow' },

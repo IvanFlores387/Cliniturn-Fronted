@@ -35,7 +35,7 @@ interface RegisterPayload {
   providedIn: 'root'
 })
 export class AuthService {
-  private readonly apiUrl = `${environment.apiUrl}/auth`;
+  private readonly apiUrl = `${environment.apiUrl}/api/auth`;
 
   private readonly tokenSignal = signal<string | null>(localStorage.getItem('token'));
   private readonly userSignal = signal<User | null>(this.getStoredUser());
@@ -57,9 +57,9 @@ export class AuthService {
     );
   }
 
+  // 🔥 MÉTODO MODIFICADO (NO guarda sesión automáticamente)
   register(payload: RegisterPayload): Observable<User> {
     return this.http.post<AuthResponse>(`${this.apiUrl}/register`, payload).pipe(
-      tap((response) => this.saveSession(response.data.token, response.data.user)),
       map((response) => response.data.user)
     );
   }

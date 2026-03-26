@@ -21,11 +21,16 @@
             "tsConfig": "tsconfig.app.json",
             "inlineStyleLanguage": "scss",
             "assets": [
-              {
+                {
                 "glob": "**/*",
-                "input": "public"
-              }
-            ],
+                    "input": "public"
+                },
+             {
+               "glob": "**/*",
+                "input": "src/assets",
+                "output": "assets"
+             }
+          ],
             "styles": [
               "src/styles.scss"
             ],
