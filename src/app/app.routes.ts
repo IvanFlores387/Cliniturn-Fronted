@@ -23,14 +23,23 @@ import { GestionConsultorios } from './screens/admin/gestion-consultorios/gestio
 import { Reportes as AdminReportesComponent } from './screens/admin/reportes/reportes';
 import { Expedientes as AdminExpedientesComponent } from './screens/admin/expedientes/expedientes';
 
+// 👉 NUEVO (IMPORTANTE)
+import { Citas as AdminCitasComponent } from './screens/admin/citas/citas';
+
 import { authGuard } from './core/guards/auth.guard';
 import { roleGuard } from './core/guards/role.guard';
 
 export const routes: Routes = [
+  // =============================
+  // PÚBLICAS
+  // =============================
   { path: '', component: LandingComponent },
   { path: 'auth/login', component: LoginComponent },
   { path: 'auth/register', component: RegisterComponent },
 
+  // =============================
+  // PACIENTE
+  // =============================
   {
     path: 'paciente',
     component: MainLayoutComponent,
@@ -46,6 +55,9 @@ export const routes: Routes = [
     ]
   },
 
+  // =============================
+  // MÉDICO
+  // =============================
   {
     path: 'medico',
     component: MainLayoutComponent,
@@ -61,6 +73,9 @@ export const routes: Routes = [
     ]
   },
 
+  // =============================
+  // ADMIN
+  // =============================
   {
     path: 'admin',
     component: MainLayoutComponent,
@@ -72,9 +87,16 @@ export const routes: Routes = [
       { path: 'gestion-consultorios', component: GestionConsultorios },
       { path: 'reportes', component: AdminReportesComponent },
       { path: 'expedientes', component: AdminExpedientesComponent },
+
+      // 👉 NUEVA RUTA AGREGADA
+      { path: 'citas', component: AdminCitasComponent },
+
       { path: '', redirectTo: 'dashboard', pathMatch: 'full' }
     ]
   },
 
+  // =============================
+  // FALLBACK
+  // =============================
   { path: '**', redirectTo: '' }
 ];

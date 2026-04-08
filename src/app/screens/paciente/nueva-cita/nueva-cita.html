@@ -1,1 +1,69 @@
-<p>nueva-cita works!</p>
+<section class="appointment-page">
+  <div class="page-header">
+    <h1>Agendar cita</h1>
+    <p>Selecciona la especialidad, el médico, la fecha y un horario disponible.</p>
+  </div>
+
+  <div class="alert success" *ngIf="successMessage()">{{ successMessage() }}</div>
+  <div class="alert error" *ngIf="errorMessage()">{{ errorMessage() }}</div>
+
+  <form class="appointment-form" [formGroup]="form" (ngSubmit)="submit()">
+    <div class="grid">
+      <div class="form-group">
+        <label>Especialidad</label>
+        <select formControlName="specialty_id">
+          <option [ngValue]="null">Selecciona una especialidad</option>
+          <option *ngFor="let item of specialties()" [ngValue]="item.id">{{ item.nombre }}</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label>Médico</label>
+        <select formControlName="doctor_id">
+          <option [ngValue]="null">Selecciona un médico</option>
+          <option *ngFor="let doctor of doctors()" [ngValue]="doctor.id">
+            {{ doctor.nombre }} {{ doctor.apellidos }} - {{ doctor.consultorio_nombre }}
+          </option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label>Fecha</label>
+        <input type="date" formControlName="fecha" />
+      </div>
+
+      <div class="form-group full">
+        <label>Motivo de consulta</label>
+        <textarea rows="4" formControlName="motivo_consulta"></textarea>
+      </div>
+    </div>
+
+    <div class="slots-section">
+      <h2>Horarios disponibles</h2>
+
+      <div *ngIf="loadingSlots()">Cargando horarios...</div>
+
+      <div class="slots-grid" *ngIf="!loadingSlots() && slots().length">
+        <button
+          type="button"
+          class="slot-btn"
+          *ngFor="let slot of slots()"
+          [class.active]="selectedSlot()?.hora_inicio === slot.hora_inicio"
+          (click)="selectSlot(slot)"
+        >
+          {{ slot.hora_inicio }} - {{ slot.hora_fin }}
+        </button>
+      </div>
+
+      <p *ngIf="!loadingSlots() && !slots().length">
+        No hay horarios disponibles para la fecha seleccionada.
+      </p>
+    </div>
+
+    <div class="actions">
+      <button type="submit" [disabled]="submitting()">
+        {{ submitting() ? 'Agendando...' : 'Agendar cita' }}
+      </button>
+    </div>
+  </form>
+</section>
