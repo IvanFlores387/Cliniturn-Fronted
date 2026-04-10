@@ -7,7 +7,7 @@ import { Appointment } from '../../../core/models/appointment.model';
 import { AppointmentsService } from '../../../services/appointments.service';
 import { NotificationService } from '../../../services/notification.service';
 import { AppointmentStatusChipComponent } from '../../../shared/components/appointment-status-chip/appointment-status-chip';
-import { ConfirmDialogComponent } from '../../../shared/components/confirm-dialog/confirm-dialog';
+import { ConfirmDialogComponent } from '../../../shared/components/appointment-status-chip/confirm-dialog/confirm-dialog';
 
 @Component({
   selector: 'app-paciente-mis-citas',
@@ -44,7 +44,8 @@ export class PacienteMisCitasComponent {
   loadAppointments(): void {
     this.loading.set(true);
 
-    this.appointmentsService.getMy()
+    this.appointmentsService
+      .getMy()
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: (data) => {
@@ -57,7 +58,7 @@ export class PacienteMisCitasComponent {
           this.notificationService.error(
             err?.error?.message || 'No se pudieron cargar tus citas.'
           );
-        }
+        },
       });
   }
 
@@ -65,11 +66,11 @@ export class PacienteMisCitasComponent {
     let data = [...this.appointments()];
 
     if (this.estadoFiltro) {
-      data = data.filter(item => item.estado === this.estadoFiltro);
+      data = data.filter((item) => item.estado === this.estadoFiltro);
     }
 
     if (this.fechaFiltro) {
-      data = data.filter(item => item.fecha === this.fechaFiltro);
+      data = data.filter((item) => item.fecha === this.fechaFiltro);
     }
 
     this.filteredAppointments.set(data);
@@ -93,18 +94,24 @@ export class PacienteMisCitasComponent {
 
   confirmCancelAppointment(): void {
     const item = this.selectedAppointment();
-    if (!item) return;
+
+    if (!item) {
+      return;
+    }
 
     this.processingId.set(item.id);
 
-    this.appointmentsService.cancel(item.id)
+    this.appointmentsService
+      .cancel(item.id)
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: () => {
           this.processingId.set(null);
           this.showCancelDialog.set(false);
           this.selectedAppointment.set(null);
-          this.notificationService.success('La cita fue cancelada correctamente.');
+          this.notificationService.success(
+            'La cita fue cancelada correctamente.'
+          );
           this.loadAppointments();
         },
         error: (err) => {
@@ -114,7 +121,7 @@ export class PacienteMisCitasComponent {
           this.notificationService.error(
             err?.error?.message || 'No se pudo cancelar la cita.'
           );
-        }
+        },
       });
   }
 
