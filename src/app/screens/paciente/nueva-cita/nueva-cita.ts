@@ -1,4 +1,4 @@
-import { Component, DestroyRef, inject, signal } from '@angular/core';
+import { Component, DestroyRef, computed, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
@@ -47,44 +47,75 @@ export class NuevaCita {
     specialty_id: [null as number | null, Validators.required],
     doctor_id: [null as number | null, Validators.required],
     fecha: ['', Validators.required],
-    motivo_consulta: ['', [Validators.required, Validators.minLength(5), Validators.maxLength(255)]],
+    motivo_consulta: [
+      '',
+      [Validators.required, Validators.minLength(5), Validators.maxLength(255)],
+    ],
+  });
+
+  readonly selectedDoctorName = computed(() => {
+    const doctorId = this.form.get('doctor_id')?.value;
+
+    if (doctorId === null || doctorId === undefined) {
+      return '';
+    }
+
+    const doctor = this.doctors().find(
+      (item) => Number(item.id) === Number(doctorId)
+    );
+
+    if (!doctor) {
+      return '';
+    }
+
+    return `${doctor.nombre} ${doctor.apellidos}`;
   });
 
   constructor() {
     this.loadSpecialties();
 
-    this.form.get('specialty_id')?.valueChanges
-      .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe(value => {
-        this.form.patchValue({ doctor_id: null });
+    this.form
+      .get('specialty_id')
+      ?.valueChanges.pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((value) => {
+        this.form.patchValue({ doctor_id: null }, { emitEvent: false });
         this.doctors.set([]);
         this.slots.set([]);
         this.selectedSlot.set(null);
 
-        if (value) {
-          this.loadDoctors(value);
+        if (value !== null && value !== undefined) {
+          this.loadDoctors(Number(value));
         }
       });
 
-    this.form.get('doctor_id')?.valueChanges
-      .pipe(takeUntilDestroyed(this.destroyRef))
+    this.form
+      .get('doctor_id')
+      ?.valueChanges.pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe(() => this.tryLoadAvailability());
 
-    this.form.get('fecha')?.valueChanges
-      .pipe(takeUntilDestroyed(this.destroyRef))
+    this.form
+      .get('fecha')
+      ?.valueChanges.pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe(() => this.tryLoadAvailability());
   }
 
-  get selectedDoctorName(): string {
-    const doctorId = this.form.value.doctor_id;
-    const doctor = this.doctors().find(item => item.id === doctorId);
+  getSelectedSpecialtyName(): string {
+    const specialtyId = this.form.get('specialty_id')?.value;
 
-    if (!doctor) return '';
-    return `${doctor.nombre} ${doctor.apellidos}`;
+    if (specialtyId === null || specialtyId === undefined) {
+      return '';
+    }
+
+    const specialty = this.specialties().find(
+      (item) => Number(item.id) === Number(specialtyId)
+    );
+
+    return specialty?.nombre ?? '';
   }
 
   private loadSpecialties(): void {
-    this.specialtiesService.getAll()
+    this.specialtiesService
+      .getAll()
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: (data) => this.specialties.set(data),
@@ -92,12 +123,13 @@ export class NuevaCita {
           this.notificationService.error(
             err?.error?.message || 'No se pudieron cargar las especialidades.'
           );
-        }
+        },
       });
   }
 
   private loadDoctors(specialtyId: number): void {
-    this.doctorsService.getAll(specialtyId)
+    this.doctorsService
+      .getAll(specialtyId)
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: (data) => this.doctors.set(data),
@@ -105,22 +137,25 @@ export class NuevaCita {
           this.notificationService.error(
             err?.error?.message || 'No se pudieron cargar los médicos.'
           );
-        }
+        },
       });
   }
 
   private tryLoadAvailability(): void {
-    const doctorId = this.form.value.doctor_id;
-    const fecha = this.form.value.fecha;
+    const doctorId = this.form.get('doctor_id')?.value;
+    const fecha = this.form.get('fecha')?.value;
 
     this.selectedSlot.set(null);
     this.slots.set([]);
 
-    if (!doctorId || !fecha) return;
+    if (!doctorId || !fecha) {
+      return;
+    }
 
     this.loadingSlots.set(true);
 
-    this.doctorsService.getAvailability(doctorId, fecha)
+    this.doctorsService
+      .getAvailability(Number(doctorId), fecha)
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: (data) => {
@@ -128,7 +163,9 @@ export class NuevaCita {
           this.loadingSlots.set(false);
 
           if (!data.length) {
-            this.notificationService.info('No hay horarios disponibles para la fecha seleccionada.');
+            this.notificationService.info(
+              'No hay horarios disponibles para la fecha seleccionada.'
+            );
           }
         },
         error: (err) => {
@@ -136,7 +173,7 @@ export class NuevaCita {
           this.notificationService.error(
             err?.error?.message || 'No se pudo cargar la disponibilidad.'
           );
-        }
+        },
       });
   }
 
@@ -147,7 +184,9 @@ export class NuevaCita {
   openConfirmDialog(): void {
     if (this.form.invalid || !this.selectedSlot()) {
       this.form.markAllAsTouched();
-      this.notificationService.error('Completa todos los campos y selecciona un horario.');
+      this.notificationService.error(
+        'Completa todos los campos y selecciona un horario.'
+      );
       return;
     }
 
@@ -162,43 +201,58 @@ export class NuevaCita {
 
   confirmCreateAppointment(): void {
     const slot = this.selectedSlot();
-    if (!slot) return;
+
+    if (!slot) {
+      return;
+    }
+
+    const doctorId = this.form.get('doctor_id')?.value;
+    const fecha = this.form.get('fecha')?.value;
+    const motivoConsulta = this.form.get('motivo_consulta')?.value;
+
+    if (!doctorId || !fecha || !motivoConsulta) {
+      this.notificationService.error(
+        'Faltan datos para registrar la cita.'
+      );
+      return;
+    }
 
     this.submitting.set(true);
 
-    this.appointmentsService.create({
-      doctor_id: this.form.value.doctor_id!,
-      fecha: this.form.value.fecha!,
-      hora_inicio: slot.hora_inicio,
-      hora_fin: slot.hora_fin,
-      motivo_consulta: this.form.value.motivo_consulta!.trim(),
-    })
-    .pipe(takeUntilDestroyed(this.destroyRef))
-    .subscribe({
-      next: () => {
-        this.submitting.set(false);
-        this.showConfirmDialog.set(false);
-        this.notificationService.success('Cita agendada correctamente.');
+    this.appointmentsService
+      .create({
+        doctor_id: Number(doctorId),
+        fecha,
+        hora_inicio: slot.hora_inicio,
+        hora_fin: slot.hora_fin,
+        motivo_consulta: String(motivoConsulta).trim(),
+      })
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: () => {
+          this.submitting.set(false);
+          this.showConfirmDialog.set(false);
+          this.notificationService.success('Cita agendada correctamente.');
 
-        this.form.reset({
-          specialty_id: null,
-          doctor_id: null,
-          fecha: '',
-          motivo_consulta: '',
-        });
+          this.form.reset({
+            specialty_id: null,
+            doctor_id: null,
+            fecha: '',
+            motivo_consulta: '',
+          });
 
-        this.doctors.set([]);
-        this.slots.set([]);
-        this.selectedSlot.set(null);
-      },
-      error: (err) => {
-        this.submitting.set(false);
-        this.showConfirmDialog.set(false);
-        this.notificationService.error(
-          err?.error?.message || 'No se pudo agendar la cita.'
-        );
-      }
-    });
+          this.doctors.set([]);
+          this.slots.set([]);
+          this.selectedSlot.set(null);
+        },
+        error: (err) => {
+          this.submitting.set(false);
+          this.showConfirmDialog.set(false);
+          this.notificationService.error(
+            err?.error?.message || 'No se pudo agendar la cita.'
+          );
+        },
+      });
   }
 
   trackBySlot(_: number, slot: AvailabilitySlot): string {

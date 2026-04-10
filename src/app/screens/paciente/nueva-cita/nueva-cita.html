@@ -19,7 +19,10 @@
               </option>
             </select>
 
-            <small class="error-text" *ngIf="form.get('specialty_id')?.touched && form.get('specialty_id')?.invalid">
+            <small
+              class="error-text"
+              *ngIf="form.get('specialty_id')?.touched && form.get('specialty_id')?.invalid"
+            >
               La especialidad es obligatoria.
             </small>
           </div>
@@ -33,7 +36,10 @@
               </option>
             </select>
 
-            <small class="error-text" *ngIf="form.get('doctor_id')?.touched && form.get('doctor_id')?.invalid">
+            <small
+              class="error-text"
+              *ngIf="form.get('doctor_id')?.touched && form.get('doctor_id')?.invalid"
+            >
               El médico es obligatorio.
             </small>
           </div>
@@ -42,7 +48,10 @@
             <label for="fecha">Fecha</label>
             <input id="fecha" type="date" formControlName="fecha" />
 
-            <small class="error-text" *ngIf="form.get('fecha')?.touched && form.get('fecha')?.invalid">
+            <small
+              class="error-text"
+              *ngIf="form.get('fecha')?.touched && form.get('fecha')?.invalid"
+            >
               La fecha es obligatoria.
             </small>
           </div>
@@ -56,7 +65,10 @@
               placeholder="Describe brevemente el motivo de tu consulta"
             ></textarea>
 
-            <small class="error-text" *ngIf="form.get('motivo_consulta')?.touched && form.get('motivo_consulta')?.invalid">
+            <small
+              class="error-text"
+              *ngIf="form.get('motivo_consulta')?.touched && form.get('motivo_consulta')?.invalid"
+            >
               El motivo de consulta es obligatorio y debe tener entre 5 y 255 caracteres.
             </small>
           </div>
@@ -67,8 +79,8 @@
         <div class="section-header">
           <div>
             <h2>Horarios disponibles</h2>
-            <p *ngIf="form.value.fecha && selectedDoctorName">
-              {{ selectedDoctorName }} · {{ form.value.fecha }}
+            <p *ngIf="form.value.fecha && selectedDoctorName()">
+              {{ selectedDoctorName() }} · {{ form.value.fecha }}
             </p>
           </div>
         </div>
@@ -97,12 +109,12 @@
 
       <div class="summary-item">
         <span class="label">Especialidad</span>
-        <span>{{ specialties().find(s => s.id === form.value.specialty_id)?.nombre || 'Sin seleccionar' }}</span>
+        <span>{{ getSelectedSpecialtyName() || 'Sin seleccionar' }}</span>
       </div>
 
       <div class="summary-item">
         <span class="label">Médico</span>
-        <span>{{ selectedDoctorName || 'Sin seleccionar' }}</span>
+        <span>{{ selectedDoctorName() || 'Sin seleccionar' }}</span>
       </div>
 
       <div class="summary-item">
