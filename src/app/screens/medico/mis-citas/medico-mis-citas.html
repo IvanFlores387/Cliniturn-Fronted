@@ -1,0 +1,117 @@
+<section class="appointments-page">
+  <div class="page-header">
+    <div>
+      <h1>Mis citas asignadas</h1>
+      <p>Gestiona el estado de tus citas médicas.</p>
+    </div>
+    <button type="button" class="btn-secondary" (click)="loadAppointments()">
+      Recargar
+    </button>
+  </div>
+
+  <div class="filters-card">
+    <div class="filters-grid">
+      <div class="form-group">
+        <label for="estadoFiltro">Estado</label>
+        <select id="estadoFiltro" [(ngModel)]="estadoFiltro" (ngModelChange)="applyFilters()">
+          <option value="">Todos</option>
+          <option value="pendiente">Pendiente</option>
+          <option value="confirmada">Confirmada</option>
+          <option value="cancelada">Cancelada</option>
+          <option value="atendida">Atendida</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label for="fechaFiltro">Fecha</label>
+        <input id="fechaFiltro" type="date" [(ngModel)]="fechaFiltro" (ngModelChange)="applyFilters()">
+      </div>
+    </div>
+  </div>
+
+  <div *ngIf="loading()" class="state-box">
+    Cargando citas...
+  </div>
+
+  <div *ngIf="!loading() && !filteredAppointments().length" class="state-box empty">
+    No hay citas disponibles con los filtros actuales.
+  </div>
+
+  <div class="cards-grid" *ngIf="!loading() && filteredAppointments().length">
+    <article
+      class="appointment-card"
+      *ngFor="let item of filteredAppointments(); trackBy: trackByAppointmentId"
+    >
+      <div class="card-top">
+        <h3>{{ item.fecha }} · {{ item.hora_inicio }} - {{ item.hora_fin }}</h3>
+        <app-appointment-status-chip [status]="item.estado"></app-appointment-status-chip>
+      </div>
+
+      <div class="card-body">
+        <div class="info-row">
+          <span class="label">Paciente:</span>
+          <span>{{ item.paciente_nombre }} {{ item.paciente_apellidos }}</span>
+        </div>
+
+        <div class="info-row">
+          <span class="label">Especialidad:</span>
+          <span>{{ item.specialty_nombre }}</span>
+        </div>
+
+        <div class="info-row">
+          <span class="label">Consultorio:</span>
+          <span>{{ item.consultorio_nombre }}</span>
+        </div>
+
+        <div class="info-row">
+          <span class="label">Motivo:</span>
+          <span>{{ item.motivo_consulta }}</span>
+        </div>
+      </div>
+
+      <div class="card-actions">
+        <button
+          type="button"
+          class="btn-primary"
+          *ngIf="canConfirm(item)"
+          [disabled]="processingId() === item.id"
+          (click)="openActionDialog(item, 'confirm')"
+        >
+          Confirmar
+        </button>
+
+        <button
+          type="button"
+          class="btn-success"
+          *ngIf="canAttend(item)"
+          [disabled]="processingId() === item.id"
+          (click)="openActionDialog(item, 'attended')"
+        >
+          Atendida
+        </button>
+
+        <button
+          type="button"
+          class="btn-danger"
+          *ngIf="canCancel(item)"
+          [disabled]="processingId() === item.id"
+          (click)="openActionDialog(item, 'cancel')"
+        >
+          Cancelar
+        </button>
+      </div>
+    </article>
+  </div>
+
+  <app-confirm-dialog
+    [visible]="showActionDialog()"
+    [loading]="processingId() !== null"
+    [title]="dialogTitle"
+    [message]="dialogMessage"
+    [confirmText]="confirmButtonText"
+    cancelText="Volver"
+    [variant]="dialogVariant"
+    (confirmed)="executeAction()"
+    (cancelled)="closeActionDialog()"
+  ></app-confirm-dialog>
+</section>

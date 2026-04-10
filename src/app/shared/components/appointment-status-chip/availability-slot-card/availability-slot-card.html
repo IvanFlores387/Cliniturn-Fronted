@@ -1,0 +1,11 @@
+<button
+  type="button"
+  class="slot-card"
+  [class.selected]="selected"
+  (click)="onSelect()"
+>
+  <span class="slot-time">{{ slot.hora_inicio }}</span>
+  <span class="slot-separator">a</span>
+  <span class="slot-time">{{ slot.hora_fin }}</span>
+  <span class="slot-state">Disponible</span>
+</button>

@@ -1,0 +1,88 @@
+<section class="appointments-page">
+  <div class="page-header">
+    <div>
+      <h1>Consulta general de citas</h1>
+      <p>Visualiza todas las citas registradas en el sistema.</p>
+    </div>
+
+    <div class="header-actions">
+      <button type="button" class="btn-secondary" (click)="clearFilters()">
+        Limpiar filtros
+      </button>
+      <button type="button" class="btn-primary" (click)="loadAppointments()">
+        Recargar
+      </button>
+    </div>
+  </div>
+
+  <div class="alert error" *ngIf="errorMessage()">{{ errorMessage() }}</div>
+
+  <div class="filters-card">
+    <div class="filters-grid">
+      <div class="form-group">
+        <label for="estadoFiltro">Estado</label>
+        <select id="estadoFiltro" [(ngModel)]="estadoFiltro" (ngModelChange)="applyFilters()">
+          <option value="">Todos</option>
+          <option value="pendiente">Pendiente</option>
+          <option value="confirmada">Confirmada</option>
+          <option value="cancelada">Cancelada</option>
+          <option value="atendida">Atendida</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label for="fechaFiltro">Fecha</label>
+        <input id="fechaFiltro" type="date" [(ngModel)]="fechaFiltro" (ngModelChange)="applyFilters()">
+      </div>
+
+      <div class="form-group">
+        <label for="medicoFiltro">Médico</label>
+        <input id="medicoFiltro" type="text" [(ngModel)]="medicoFiltro" (ngModelChange)="applyFilters()" placeholder="Buscar médico">
+      </div>
+
+      <div class="form-group">
+        <label for="especialidadFiltro">Especialidad</label>
+        <input id="especialidadFiltro" type="text" [(ngModel)]="especialidadFiltro" (ngModelChange)="applyFilters()" placeholder="Buscar especialidad">
+      </div>
+    </div>
+  </div>
+
+  <div *ngIf="loading()" class="state-box">
+    Cargando citas...
+  </div>
+
+  <div *ngIf="!loading() && !filteredAppointments().length" class="state-box empty">
+    No se encontraron citas con los filtros actuales.
+  </div>
+
+  <div class="table-wrapper" *ngIf="!loading() && filteredAppointments().length">
+    <table class="appointments-table">
+      <thead>
+        <tr>
+          <th>Fecha</th>
+          <th>Hora</th>
+          <th>Paciente</th>
+          <th>Médico</th>
+          <th>Especialidad</th>
+          <th>Consultorio</th>
+          <th>Motivo</th>
+          <th>Estado</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let item of filteredAppointments(); trackBy: trackByAppointmentId">
+          <td>{{ item.fecha }}</td>
+          <td>{{ item.hora_inicio }} - {{ item.hora_fin }}</td>
+          <td>{{ item.paciente_nombre }} {{ item.paciente_apellidos }}</td>
+          <td>{{ item.doctor_nombre }} {{ item.doctor_apellidos }}</td>
+          <td>{{ item.specialty_nombre }}</td>
+          <td>{{ item.consultorio_nombre }}</td>
+          <td>{{ item.motivo_consulta }}</td>
+          <td>
+            <app-appointment-status-chip [status]="item.estado"></app-appointment-status-chip>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</section>

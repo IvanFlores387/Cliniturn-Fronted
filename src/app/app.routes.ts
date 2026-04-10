@@ -7,14 +7,12 @@ import { RegisterComponent } from './screens/auth/register/register';
 
 import { Dashboard as PacienteDashboardComponent } from './screens/paciente/dashboard/dashboard';
 import { NuevaCita } from './screens/paciente/nueva-cita/nueva-cita';
-import { MisCitas as PacienteMisCitasComponent } from './screens/paciente/mis-citas/mis-citas';
 import { Expediente as PacienteExpedienteComponent } from './screens/paciente/expediente/expediente';
 import { Estadisticas } from './screens/paciente/estadisticas/estadisticas';
 
 import { Dashboard as MedicoDashboardComponent } from './screens/medico/dashboard/dashboard';
 import { CitasHoy } from './screens/medico/citas-hoy/citas-hoy';
 import { ProximasCitas } from './screens/medico/proximas-citas/proximas-citas';
-import { MisCitas as MedicoMisCitasComponent } from './screens/medico/mis-citas/mis-citas';
 import { Expedientes as MedicoExpedientesComponent } from './screens/medico/expedientes/expedientes';
 
 import { Dashboard as AdminDashboardComponent } from './screens/admin/dashboard/dashboard';
@@ -22,9 +20,6 @@ import { GestionMedicos } from './screens/admin/gestion-medicos/gestion-medicos'
 import { GestionConsultorios } from './screens/admin/gestion-consultorios/gestion-consultorios';
 import { Reportes as AdminReportesComponent } from './screens/admin/reportes/reportes';
 import { Expedientes as AdminExpedientesComponent } from './screens/admin/expedientes/expedientes';
-
-// 👉 NUEVO (IMPORTANTE)
-import { Citas as AdminCitasComponent } from './screens/admin/citas/citas';
 
 import { authGuard } from './core/guards/auth.guard';
 import { roleGuard } from './core/guards/role.guard';
@@ -48,7 +43,13 @@ export const routes: Routes = [
     children: [
       { path: 'dashboard', component: PacienteDashboardComponent },
       { path: 'nueva-cita', component: NuevaCita },
-      { path: 'mis-citas', component: PacienteMisCitasComponent },
+      {
+        path: 'mis-citas',
+        loadComponent: () =>
+          import('./screens/paciente/mis-citas/paciente-mis-citas').then(
+            m => m.PacienteMisCitasComponent
+          )
+      },
       { path: 'expediente', component: PacienteExpedienteComponent },
       { path: 'estadisticas', component: Estadisticas },
       { path: '', redirectTo: 'dashboard', pathMatch: 'full' }
@@ -67,7 +68,13 @@ export const routes: Routes = [
       { path: 'dashboard', component: MedicoDashboardComponent },
       { path: 'citas-hoy', component: CitasHoy },
       { path: 'proximas-citas', component: ProximasCitas },
-      { path: 'mis-citas', component: MedicoMisCitasComponent },
+      {
+        path: 'mis-citas',
+        loadComponent: () =>
+          import('./screens/medico/mis-citas/medico-mis-citas').then(
+            m => m.MedicoMisCitasComponent
+          )
+      },
       { path: 'expedientes', component: MedicoExpedientesComponent },
       { path: '', redirectTo: 'dashboard', pathMatch: 'full' }
     ]
@@ -87,10 +94,13 @@ export const routes: Routes = [
       { path: 'gestion-consultorios', component: GestionConsultorios },
       { path: 'reportes', component: AdminReportesComponent },
       { path: 'expedientes', component: AdminExpedientesComponent },
-
-      // 👉 NUEVA RUTA AGREGADA
-      { path: 'citas', component: AdminCitasComponent },
-
+      {
+        path: 'citas',
+        loadComponent: () =>
+          import('./screens/admin/citas/admin-citas').then(
+            m => m.AdminCitasComponent
+          )
+      },
       { path: '', redirectTo: 'dashboard', pathMatch: 'full' }
     ]
   },

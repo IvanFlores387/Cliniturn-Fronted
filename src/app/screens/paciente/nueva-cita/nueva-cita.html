@@ -1,69 +1,151 @@
 <section class="appointment-page">
   <div class="page-header">
-    <h1>Agendar cita</h1>
-    <p>Selecciona la especialidad, el médico, la fecha y un horario disponible.</p>
+    <h1>Agendar cita médica</h1>
+    <p>Selecciona la especialidad, el médico, la fecha y el horario disponible.</p>
   </div>
 
-  <div class="alert success" *ngIf="successMessage()">{{ successMessage() }}</div>
-  <div class="alert error" *ngIf="errorMessage()">{{ errorMessage() }}</div>
+  <div class="appointment-layout">
+    <form class="appointment-form" [formGroup]="form">
+      <div class="section-card">
+        <h2>Datos de la cita</h2>
 
-  <form class="appointment-form" [formGroup]="form" (ngSubmit)="submit()">
-    <div class="grid">
-      <div class="form-group">
-        <label>Especialidad</label>
-        <select formControlName="specialty_id">
-          <option [ngValue]="null">Selecciona una especialidad</option>
-          <option *ngFor="let item of specialties()" [ngValue]="item.id">{{ item.nombre }}</option>
-        </select>
+        <div class="grid">
+          <div class="form-group">
+            <label for="specialty_id">Especialidad</label>
+            <select id="specialty_id" formControlName="specialty_id">
+              <option [ngValue]="null">Selecciona una especialidad</option>
+              <option *ngFor="let item of specialties()" [ngValue]="item.id">
+                {{ item.nombre }}
+              </option>
+            </select>
+
+            <small class="error-text" *ngIf="form.get('specialty_id')?.touched && form.get('specialty_id')?.invalid">
+              La especialidad es obligatoria.
+            </small>
+          </div>
+
+          <div class="form-group">
+            <label for="doctor_id">Médico</label>
+            <select id="doctor_id" formControlName="doctor_id">
+              <option [ngValue]="null">Selecciona un médico</option>
+              <option *ngFor="let doctor of doctors()" [ngValue]="doctor.id">
+                {{ doctor.nombre }} {{ doctor.apellidos }} - {{ doctor.consultorio_nombre }}
+              </option>
+            </select>
+
+            <small class="error-text" *ngIf="form.get('doctor_id')?.touched && form.get('doctor_id')?.invalid">
+              El médico es obligatorio.
+            </small>
+          </div>
+
+          <div class="form-group">
+            <label for="fecha">Fecha</label>
+            <input id="fecha" type="date" formControlName="fecha" />
+
+            <small class="error-text" *ngIf="form.get('fecha')?.touched && form.get('fecha')?.invalid">
+              La fecha es obligatoria.
+            </small>
+          </div>
+
+          <div class="form-group full">
+            <label for="motivo_consulta">Motivo de consulta</label>
+            <textarea
+              id="motivo_consulta"
+              rows="4"
+              formControlName="motivo_consulta"
+              placeholder="Describe brevemente el motivo de tu consulta"
+            ></textarea>
+
+            <small class="error-text" *ngIf="form.get('motivo_consulta')?.touched && form.get('motivo_consulta')?.invalid">
+              El motivo de consulta es obligatorio y debe tener entre 5 y 255 caracteres.
+            </small>
+          </div>
+        </div>
       </div>
 
-      <div class="form-group">
-        <label>Médico</label>
-        <select formControlName="doctor_id">
-          <option [ngValue]="null">Selecciona un médico</option>
-          <option *ngFor="let doctor of doctors()" [ngValue]="doctor.id">
-            {{ doctor.nombre }} {{ doctor.apellidos }} - {{ doctor.consultorio_nombre }}
-          </option>
-        </select>
+      <div class="section-card">
+        <div class="section-header">
+          <div>
+            <h2>Horarios disponibles</h2>
+            <p *ngIf="form.value.fecha && selectedDoctorName">
+              {{ selectedDoctorName }} · {{ form.value.fecha }}
+            </p>
+          </div>
+        </div>
+
+        <div *ngIf="loadingSlots()" class="state-box">
+          Cargando horarios disponibles...
+        </div>
+
+        <div class="slots-grid" *ngIf="!loadingSlots() && slots().length">
+          <app-availability-slot-card
+            *ngFor="let slot of slots(); trackBy: trackBySlot"
+            [slot]="slot"
+            [selected]="selectedSlot()?.hora_inicio === slot.hora_inicio && selectedSlot()?.hora_fin === slot.hora_fin"
+            (selectedChange)="selectSlot($event)"
+          ></app-availability-slot-card>
+        </div>
+
+        <div *ngIf="!loadingSlots() && !slots().length" class="state-box empty">
+          No hay horarios disponibles para los datos seleccionados.
+        </div>
+      </div>
+    </form>
+
+    <aside class="summary-card">
+      <h2>Resumen</h2>
+
+      <div class="summary-item">
+        <span class="label">Especialidad</span>
+        <span>{{ specialties().find(s => s.id === form.value.specialty_id)?.nombre || 'Sin seleccionar' }}</span>
       </div>
 
-      <div class="form-group">
-        <label>Fecha</label>
-        <input type="date" formControlName="fecha" />
+      <div class="summary-item">
+        <span class="label">Médico</span>
+        <span>{{ selectedDoctorName || 'Sin seleccionar' }}</span>
       </div>
 
-      <div class="form-group full">
-        <label>Motivo de consulta</label>
-        <textarea rows="4" formControlName="motivo_consulta"></textarea>
-      </div>
-    </div>
-
-    <div class="slots-section">
-      <h2>Horarios disponibles</h2>
-
-      <div *ngIf="loadingSlots()">Cargando horarios...</div>
-
-      <div class="slots-grid" *ngIf="!loadingSlots() && slots().length">
-        <button
-          type="button"
-          class="slot-btn"
-          *ngFor="let slot of slots()"
-          [class.active]="selectedSlot()?.hora_inicio === slot.hora_inicio"
-          (click)="selectSlot(slot)"
-        >
-          {{ slot.hora_inicio }} - {{ slot.hora_fin }}
-        </button>
+      <div class="summary-item">
+        <span class="label">Fecha</span>
+        <span>{{ form.value.fecha || 'Sin seleccionar' }}</span>
       </div>
 
-      <p *ngIf="!loadingSlots() && !slots().length">
-        No hay horarios disponibles para la fecha seleccionada.
-      </p>
-    </div>
+      <div class="summary-item">
+        <span class="label">Horario</span>
+        <span>
+          {{
+            selectedSlot()
+              ? (selectedSlot()!.hora_inicio + ' - ' + selectedSlot()!.hora_fin)
+              : 'Sin seleccionar'
+          }}
+        </span>
+      </div>
 
-    <div class="actions">
-      <button type="submit" [disabled]="submitting()">
-        {{ submitting() ? 'Agendando...' : 'Agendar cita' }}
+      <div class="summary-item">
+        <span class="label">Motivo</span>
+        <span>{{ form.value.motivo_consulta || 'Sin capturar' }}</span>
+      </div>
+
+      <button
+        type="button"
+        class="btn-primary submit-btn"
+        [disabled]="submitting()"
+        (click)="openConfirmDialog()"
+      >
+        {{ submitting() ? 'Agendando...' : 'Confirmar cita' }}
       </button>
-    </div>
-  </form>
+    </aside>
+  </div>
+
+  <app-confirm-dialog
+    [visible]="showConfirmDialog()"
+    [loading]="submitting()"
+    title="Confirmar cita médica"
+    message="¿Deseas registrar esta cita con los datos seleccionados?"
+    confirmText="Sí, agendar cita"
+    cancelText="Volver"
+    variant="primary"
+    (confirmed)="confirmCreateAppointment()"
+    (cancelled)="closeConfirmDialog()"
+  ></app-confirm-dialog>
 </section>

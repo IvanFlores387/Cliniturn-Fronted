@@ -1,5 +1,5 @@
 import { Injectable, inject } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable, map } from 'rxjs';
 import { environment } from '../../environments/environment';
 import { Appointment } from '../core/models/appointment.model';
@@ -10,6 +10,13 @@ export interface CreateAppointmentPayload {
   hora_inicio: string;
   hora_fin: string;
   motivo_consulta: string;
+}
+
+export interface AppointmentFilters {
+  estado?: string;
+  fecha?: string;
+  medico?: string;
+  especialidad?: string;
 }
 
 @Injectable({ providedIn: 'root' })
@@ -35,8 +42,15 @@ export class AppointmentsService {
     );
   }
 
-  getAll(): Observable<Appointment[]> {
-    return this.http.get<{ ok: boolean; data: Appointment[] }>(this.apiUrl).pipe(
+  getAll(filters?: AppointmentFilters): Observable<Appointment[]> {
+    let params = new HttpParams();
+
+    if (filters?.estado) params = params.set('estado', filters.estado);
+    if (filters?.fecha) params = params.set('fecha', filters.fecha);
+    if (filters?.medico) params = params.set('medico', filters.medico);
+    if (filters?.especialidad) params = params.set('especialidad', filters.especialidad);
+
+    return this.http.get<{ ok: boolean; data: Appointment[] }>(this.apiUrl, { params }).pipe(
       map(res => res.data)
     );
   }

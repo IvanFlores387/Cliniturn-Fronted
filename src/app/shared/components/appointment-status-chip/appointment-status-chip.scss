@@ -1,0 +1,35 @@
+.status-chip {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 110px;
+  padding: 0.45rem 0.85rem;
+  border-radius: 999px;
+  font-size: 0.875rem;
+  font-weight: 700;
+  border: 1px solid transparent;
+}
+
+.status-chip.pendiente {
+  background: #fff7ed;
+  color: #9a3412;
+  border-color: #fdba74;
+}
+
+.status-chip.confirmada {
+  background: #eff6ff;
+  color: #1d4ed8;
+  border-color: #93c5fd;
+}
+
+.status-chip.cancelada {
+  background: #fef2f2;
+  color: #b91c1c;
+  border-color: #fca5a5;
+}
+
+.status-chip.atendida {
+  background: #ecfdf5;
+  color: #047857;
+  border-color: #86efac;
+}

@@ -1,0 +1,40 @@
+<div
+  class="dialog-backdrop"
+  *ngIf="visible"
+  (click)="onBackdropClick($event)"
+>
+  <div class="dialog-card" role="dialog" aria-modal="true" aria-labelledby="dialog-title">
+    <div class="dialog-header">
+      <h2 id="dialog-title">{{ title }}</h2>
+    </div>
+
+    <div class="dialog-body">
+      <p>{{ message }}</p>
+    </div>
+
+    <div class="dialog-actions">
+      <button
+        type="button"
+        class="btn btn-light"
+        [disabled]="loading"
+        (click)="onCancel()"
+      >
+        {{ cancelText }}
+      </button>
+
+      <button
+        type="button"
+        class="btn"
+        [ngClass]="{
+          'btn-primary': variant === 'primary',
+          'btn-danger': variant === 'danger',
+          'btn-success': variant === 'success'
+        }"
+        [disabled]="loading"
+        (click)="onConfirm()"
+      >
+        {{ loading ? 'Procesando...' : confirmText }}
+      </button>
+    </div>
+  </div>
+</div>

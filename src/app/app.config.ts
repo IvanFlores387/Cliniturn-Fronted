@@ -11,6 +11,7 @@ import { provideHttpClient, withInterceptors } from '@angular/common/http';
 import { routes } from './app.routes';
 import { authInterceptor } from './core/interceptors/auth.interceptor';
 
+import { MatSnackBarModule } from '@angular/material/snack-bar';
 import {
   LucideAngularModule,
   Zap,
@@ -48,6 +49,7 @@ export const appConfig: ApplicationConfig = {
     provideZonelessChangeDetection(),
     provideRouter(routes),
     provideClientHydration(withEventReplay()),
+    importProvidersFrom(MatSnackBarModule),
     provideHttpClient(withInterceptors([authInterceptor])),
 
     importProvidersFrom(
