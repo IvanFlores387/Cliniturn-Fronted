@@ -3,6 +3,7 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable, map } from 'rxjs';
 import { environment } from '../../environments/environment';
 import { Appointment } from '../core/models/appointment.model';
+import { PaginatedResponse } from '../core/models/paginated-response.model';
 
 export interface CreateAppointmentPayload {
   doctor_id: number;
@@ -17,6 +18,8 @@ export interface AppointmentFilters {
   fecha?: string;
   medico?: string;
   especialidad?: string;
+  page?: number;
+  limit?: number;
 }
 
 @Injectable({ providedIn: 'root' })
@@ -42,23 +45,29 @@ export class AppointmentsService {
     );
   }
 
-  getAll(filters?: AppointmentFilters): Observable<Appointment[]> {
+  getAll(filters?: AppointmentFilters): Observable<PaginatedResponse<Appointment>> {
     let params = new HttpParams();
 
     if (filters?.estado) params = params.set('estado', filters.estado);
     if (filters?.fecha) params = params.set('fecha', filters.fecha);
     if (filters?.medico) params = params.set('medico', filters.medico);
     if (filters?.especialidad) params = params.set('especialidad', filters.especialidad);
+    if (filters?.page) params = params.set('page', filters.page);
+    if (filters?.limit) params = params.set('limit', filters.limit);
 
-    return this.http.get<{ ok: boolean; data: Appointment[] }>(this.apiUrl, { params }).pipe(
+    return this.http.get<{ ok: boolean; data: PaginatedResponse<Appointment> }>(
+      this.apiUrl,
+      { params }
+    ).pipe(
       map(res => res.data)
     );
   }
 
   confirm(id: number): Observable<Appointment> {
-    return this.http.patch<{ ok: boolean; data: Appointment }>(`${this.apiUrl}/${id}/confirm`, {}).pipe(
-      map(res => res.data)
-    );
+    return this.http.patch<{ ok: boolean; data: Appointment }>(
+      `${this.apiUrl}/${id}/confirm`,
+      {}
+    ).pipe(map(res => res.data));
   }
 
   cancel(id: number, notas_cancelacion?: string): Observable<Appointment> {
@@ -69,8 +78,9 @@ export class AppointmentsService {
   }
 
   attended(id: number): Observable<Appointment> {
-    return this.http.patch<{ ok: boolean; data: Appointment }>(`${this.apiUrl}/${id}/attended`, {}).pipe(
-      map(res => res.data)
-    );
+    return this.http.patch<{ ok: boolean; data: Appointment }>(
+      `${this.apiUrl}/${id}/attended`,
+      {}
+    ).pipe(map(res => res.data));
   }
 }

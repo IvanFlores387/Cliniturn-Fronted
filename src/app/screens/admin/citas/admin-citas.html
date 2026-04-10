@@ -9,19 +9,26 @@
       <button type="button" class="btn-secondary" (click)="clearFilters()">
         Limpiar filtros
       </button>
-      <button type="button" class="btn-primary" (click)="loadAppointments()">
+
+      <button type="button" class="btn-primary" (click)="loadAppointments(currentPage)">
         Recargar
       </button>
     </div>
   </div>
 
-  <div class="alert error" *ngIf="errorMessage()">{{ errorMessage() }}</div>
+  <div class="alert error" *ngIf="errorMessage()">
+    {{ errorMessage() }}
+  </div>
 
   <div class="filters-card">
     <div class="filters-grid">
       <div class="form-group">
         <label for="estadoFiltro">Estado</label>
-        <select id="estadoFiltro" [(ngModel)]="estadoFiltro" (ngModelChange)="applyFilters()">
+        <select
+          id="estadoFiltro"
+          [(ngModel)]="estadoFiltro"
+          (ngModelChange)="applyFilters()"
+        >
           <option value="">Todos</option>
           <option value="pendiente">Pendiente</option>
           <option value="confirmada">Confirmada</option>
@@ -32,17 +39,34 @@
 
       <div class="form-group">
         <label for="fechaFiltro">Fecha</label>
-        <input id="fechaFiltro" type="date" [(ngModel)]="fechaFiltro" (ngModelChange)="applyFilters()">
+        <input
+          id="fechaFiltro"
+          type="date"
+          [(ngModel)]="fechaFiltro"
+          (ngModelChange)="applyFilters()"
+        />
       </div>
 
       <div class="form-group">
         <label for="medicoFiltro">Médico</label>
-        <input id="medicoFiltro" type="text" [(ngModel)]="medicoFiltro" (ngModelChange)="applyFilters()" placeholder="Buscar médico">
+        <input
+          id="medicoFiltro"
+          type="text"
+          [(ngModel)]="medicoFiltro"
+          (ngModelChange)="applyFilters()"
+          placeholder="Buscar médico"
+        />
       </div>
 
       <div class="form-group">
         <label for="especialidadFiltro">Especialidad</label>
-        <input id="especialidadFiltro" type="text" [(ngModel)]="especialidadFiltro" (ngModelChange)="applyFilters()" placeholder="Buscar especialidad">
+        <input
+          id="especialidadFiltro"
+          type="text"
+          [(ngModel)]="especialidadFiltro"
+          (ngModelChange)="applyFilters()"
+          placeholder="Buscar especialidad"
+        />
       </div>
     </div>
   </div>
@@ -51,11 +75,11 @@
     Cargando citas...
   </div>
 
-  <div *ngIf="!loading() && !filteredAppointments().length" class="state-box empty">
+  <div *ngIf="!loading() && !hasAppointments()" class="state-box empty">
     No se encontraron citas con los filtros actuales.
   </div>
 
-  <div class="table-wrapper" *ngIf="!loading() && filteredAppointments().length">
+  <div class="table-wrapper" *ngIf="!loading() && hasAppointments()">
     <table class="appointments-table">
       <thead>
         <tr>
@@ -69,10 +93,11 @@
           <th>Estado</th>
         </tr>
       </thead>
+
       <tbody>
-        <tr *ngFor="let item of filteredAppointments(); trackBy: trackByAppointmentId">
-          <td>{{ item.fecha }}</td>
-          <td>{{ item.hora_inicio }} - {{ item.hora_fin }}</td>
+        <tr *ngFor="let item of appointments(); trackBy: trackByAppointmentId">
+          <td>{{ formatDate(item.fecha) }}</td>
+          <td>{{ formatTime(item.hora_inicio) }} - {{ formatTime(item.hora_fin) }}</td>
           <td>{{ item.paciente_nombre }} {{ item.paciente_apellidos }}</td>
           <td>{{ item.doctor_nombre }} {{ item.doctor_apellidos }}</td>
           <td>{{ item.specialty_nombre }}</td>
@@ -85,4 +110,10 @@
       </tbody>
     </table>
   </div>
+
+  <app-simple-pagination
+    *ngIf="!loading() && paginationMeta()"
+    [meta]="paginationMeta()!"
+    (pageChange)="onPageChange($event)">
+  </app-simple-pagination>
 </section>

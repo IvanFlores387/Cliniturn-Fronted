@@ -1,0 +1,26 @@
+<div class="pagination" *ngIf="meta">
+  <div class="pagination-info">
+    <span>Total: {{ meta.total }}</span>
+    <span>Página {{ meta.page }} de {{ meta.totalPages }}</span>
+  </div>
+
+  <div class="pagination-actions">
+    <button
+      type="button"
+      class="btn-page"
+      [disabled]="!meta.hasPreviousPage"
+      (click)="goToPrevious()"
+    >
+      Anterior
+    </button>
+
+    <button
+      type="button"
+      class="btn-page"
+      [disabled]="!meta.hasNextPage"
+      (click)="goToNext()"
+    >
+      Siguiente
+    </button>
+  </div>
+</div>

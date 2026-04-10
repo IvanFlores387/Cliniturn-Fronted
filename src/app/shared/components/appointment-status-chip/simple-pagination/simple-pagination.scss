@@ -1,0 +1,54 @@
+.pagination {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem;
+  background: #ffffff;
+  border-radius: 16px;
+  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.08);
+  margin-top: 1rem;
+}
+
+.pagination-info {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  color: #374151;
+  font-weight: 500;
+}
+
+.pagination-actions {
+  display: flex;
+  gap: 0.75rem;
+}
+
+.btn-page {
+  border: none;
+  border-radius: 12px;
+  padding: 0.8rem 1rem;
+  background: #2563eb;
+  color: #ffffff;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.btn-page:disabled {
+  background: #cbd5e1;
+  cursor: not-allowed;
+}
+
+@media (max-width: 768px) {
+  .pagination {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .pagination-actions {
+    width: 100%;
+  }
+
+  .btn-page {
+    width: 100%;
+  }
+}
