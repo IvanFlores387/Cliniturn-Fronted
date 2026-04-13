@@ -24,12 +24,12 @@
 
     <article class="summary-card success">
       <span>Médicos activos</span>
-      <strong>{{ doctors().filter(d => d.activo === 1).length }}</strong>
+      <strong>{{ activeDoctorsCount() }}</strong>
     </article>
 
     <article class="summary-card danger">
       <span>Médicos inactivos</span>
-      <strong>{{ doctors().filter(d => d.activo === 0).length }}</strong>
+      <strong>{{ inactiveDoctorsCount() }}</strong>
     </article>
   </div>
 

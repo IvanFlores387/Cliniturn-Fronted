@@ -24,12 +24,12 @@
 
     <article class="summary-card success">
       <span>Consultorios activos</span>
-      <strong>{{ consultorios().filter(c => c.activo === 1).length }}</strong>
+      <strong>{{ activeConsultoriosCount() }}</strong>
     </article>
 
     <article class="summary-card danger">
       <span>Consultorios inactivos</span>
-      <strong>{{ consultorios().filter(c => c.activo === 0).length }}</strong>
+      <strong>{{ inactiveConsultoriosCount() }}</strong>
     </article>
   </div>
 

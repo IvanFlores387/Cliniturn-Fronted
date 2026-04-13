@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, DestroyRef, inject, signal } from '@angular/core';
+import { Component, DestroyRef, computed, inject, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
@@ -31,6 +31,14 @@ export class GestionConsultorios {
   readonly modalVisible = signal(false);
   readonly isEditing = signal(false);
   readonly selectedConsultorioId = signal<number | null>(null);
+
+  readonly activeConsultoriosCount = computed(() =>
+    this.consultorios().filter((c) => Number(c.activo) === 1).length
+  );
+
+  readonly inactiveConsultoriosCount = computed(() =>
+    this.consultorios().filter((c) => Number(c.activo) === 0).length
+  );
 
   search = '';
   activoFiltro: number | '' = '';
@@ -82,12 +90,14 @@ export class GestionConsultorios {
   openCreateModal(): void {
     this.isEditing.set(false);
     this.selectedConsultorioId.set(null);
+
     this.form.reset({
       nombre: '',
       ubicacion: '',
       descripcion: '',
       activo: 1,
     });
+
     this.modalVisible.set(true);
   }
 
@@ -99,7 +109,7 @@ export class GestionConsultorios {
       nombre: item.nombre,
       ubicacion: item.ubicacion || '',
       descripcion: item.descripcion || '',
-      activo: item.activo,
+      activo: Number(item.activo),
     });
 
     this.modalVisible.set(true);
@@ -126,9 +136,10 @@ export class GestionConsultorios {
 
     this.submitting.set(true);
 
-    const request$ = this.isEditing() && this.selectedConsultorioId()
-      ? this.consultoriosService.update(this.selectedConsultorioId()!, payload)
-      : this.consultoriosService.create(payload);
+    const request$ =
+      this.isEditing() && this.selectedConsultorioId()
+        ? this.consultoriosService.update(this.selectedConsultorioId()!, payload)
+        : this.consultoriosService.create(payload);
 
     request$
       .pipe(takeUntilDestroyed(this.destroyRef))
@@ -136,11 +147,13 @@ export class GestionConsultorios {
         next: () => {
           this.submitting.set(false);
           this.modalVisible.set(false);
+
           this.notificationService.success(
             this.isEditing()
               ? 'Consultorio actualizado correctamente.'
               : 'Consultorio creado correctamente.'
           );
+
           this.loadConsultorios();
         },
         error: (err) => {
@@ -153,7 +166,7 @@ export class GestionConsultorios {
   }
 
   toggleStatus(item: Consultorio): void {
-    const nuevoEstado = item.activo === 1 ? 0 : 1;
+    const nuevoEstado = Number(item.activo) === 1 ? 0 : 1;
     const accion = nuevoEstado === 1 ? 'activar' : 'desactivar';
 
     const confirmar = window.confirm(

@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, DestroyRef, inject, signal } from '@angular/core';
+import { Component, DestroyRef, computed, inject, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { FormsModule } from '@angular/forms';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
@@ -42,6 +42,14 @@ export class GestionMedicos {
   readonly isEditing = signal(false);
   readonly selectedDoctorId = signal<number | null>(null);
 
+  readonly activeDoctorsCount = computed(() =>
+    this.doctors().filter((d) => Number(d.activo) === 1).length
+  );
+
+  readonly inactiveDoctorsCount = computed(() =>
+    this.doctors().filter((d) => Number(d.activo) === 0).length
+  );
+
   search = '';
   specialtyFiltro: number | '' = '';
   consultorioFiltro: number | '' = '';
@@ -63,12 +71,36 @@ export class GestionMedicos {
     this.loadDoctors();
   }
 
+  private extractArray<T>(response: unknown): T[] {
+    if (Array.isArray(response)) {
+      return response as T[];
+    }
+
+    if (!response || typeof response !== 'object') {
+      return [];
+    }
+
+    const candidate = response as Record<string, unknown>;
+    const possibleKeys = ['data', 'items', 'results', 'rows', 'records', 'list', 'content'];
+
+    for (const key of possibleKeys) {
+      const value = candidate[key];
+      if (Array.isArray(value)) {
+        return value as T[];
+      }
+    }
+
+    return [];
+  }
+
   private loadCatalogs(): void {
     this.specialtiesService
       .getAll()
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
-        next: (data) => this.specialties.set(data),
+        next: (data) => {
+          this.specialties.set(this.extractArray<Specialty>(data));
+        },
         error: () => {
           this.notificationService.error('No se pudieron cargar las especialidades.');
         },
@@ -78,7 +110,9 @@ export class GestionMedicos {
       .getAll({ activo: 1 })
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
-        next: (data) => this.consultorios.set(data),
+        next: (data) => {
+          this.consultorios.set(this.extractArray<Consultorio>(data));
+        },
         error: () => {
           this.notificationService.error('No se pudieron cargar los consultorios.');
         },
@@ -97,8 +131,8 @@ export class GestionMedicos {
       })
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
-        next: (data) => {
-          this.doctors.set(data);
+        next: (response: unknown) => {
+          this.doctors.set(this.extractArray<Doctor>(response));
           this.loading.set(false);
         },
         error: (err) => {
@@ -159,7 +193,7 @@ export class GestionMedicos {
       specialty_id: item.specialty_id,
       consultorio_id: item.consultorio_id,
       duracion_cita_minutos: item.duracion_cita_minutos,
-      activo: item.activo,
+      activo: Number(item.activo),
     });
 
     this.form.get('password')?.clearValidators();
@@ -224,7 +258,7 @@ export class GestionMedicos {
   }
 
   toggleStatus(item: Doctor): void {
-    const nuevoEstado = item.activo === 1 ? 0 : 1;
+    const nuevoEstado = Number(item.activo) === 1 ? 0 : 1;
     const accion = nuevoEstado === 1 ? 'activar' : 'desactivar';
 
     const confirmar = window.confirm(
