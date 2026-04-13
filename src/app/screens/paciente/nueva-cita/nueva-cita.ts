@@ -15,6 +15,11 @@ import { AvailabilitySlot } from '../../../core/models/availability-slot.model';
 import { ConfirmDialogComponent } from '../../../shared/components/appointment-status-chip/confirm-dialog/confirm-dialog';
 import { AvailabilitySlotCardComponent } from '../../../shared/components/appointment-status-chip/availability-slot-card/availability-slot-card';
 
+interface ConsultorioOption {
+  id: number;
+  nombre: string;
+}
+
 @Component({
   selector: 'app-nueva-cita',
   standalone: true,
@@ -37,14 +42,20 @@ export class NuevaCita {
 
   readonly specialties = signal<Specialty[]>([]);
   readonly doctors = signal<Doctor[]>([]);
+  readonly filteredDoctors = signal<Doctor[]>([]);
   readonly slots = signal<AvailabilitySlot[]>([]);
+  readonly consultorios = signal<ConsultorioOption[]>([]);
   readonly loadingSlots = signal(false);
+  readonly loadingDoctors = signal(false);
   readonly submitting = signal(false);
   readonly selectedSlot = signal<AvailabilitySlot | null>(null);
   readonly showConfirmDialog = signal(false);
 
+  readonly today = this.getTodayDate();
+
   readonly form = this.fb.group({
     specialty_id: [null as number | null, Validators.required],
+    consultorio_id: [null as number | null],
     doctor_id: [null as number | null, Validators.required],
     fecha: ['', Validators.required],
     motivo_consulta: [
@@ -53,22 +64,28 @@ export class NuevaCita {
     ],
   });
 
-  readonly selectedDoctorName = computed(() => {
+  readonly selectedDoctor = computed(() => {
     const doctorId = this.form.get('doctor_id')?.value;
+    if (!doctorId) return null;
+    return this.filteredDoctors().find((item) => Number(item.id) === Number(doctorId)) ?? null;
+  });
 
-    if (doctorId === null || doctorId === undefined) {
-      return '';
-    }
-
-    const doctor = this.doctors().find(
-      (item) => Number(item.id) === Number(doctorId)
-    );
-
-    if (!doctor) {
-      return '';
-    }
-
+  readonly selectedDoctorName = computed(() => {
+    const doctor = this.selectedDoctor();
+    if (!doctor) return '';
     return `${doctor.nombre} ${doctor.apellidos}`;
+  });
+
+  readonly selectedSpecialtyName = computed(() => {
+    const specialtyId = this.form.get('specialty_id')?.value;
+    if (!specialtyId) return '';
+    return this.specialties().find((item) => Number(item.id) === Number(specialtyId))?.nombre ?? '';
+  });
+
+  readonly selectedConsultorioName = computed(() => {
+    const doctor = this.selectedDoctor();
+    if (!doctor) return '';
+    return doctor.consultorio_nombre ?? '';
   });
 
   constructor() {
@@ -78,8 +95,18 @@ export class NuevaCita {
       .get('specialty_id')
       ?.valueChanges.pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe((value) => {
-        this.form.patchValue({ doctor_id: null }, { emitEvent: false });
+        this.form.patchValue(
+          {
+            consultorio_id: null,
+            doctor_id: null,
+            fecha: '',
+          },
+          { emitEvent: false }
+        );
+
         this.doctors.set([]);
+        this.filteredDoctors.set([]);
+        this.consultorios.set([]);
         this.slots.set([]);
         this.selectedSlot.set(null);
 
@@ -89,9 +116,58 @@ export class NuevaCita {
       });
 
     this.form
+      .get('consultorio_id')
+      ?.valueChanges.pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((consultorioId) => {
+        const allDoctors = this.doctors();
+
+        if (!consultorioId) {
+          this.filteredDoctors.set(allDoctors);
+        } else {
+          this.filteredDoctors.set(
+            allDoctors.filter((item) => Number(item.consultorio_id) === Number(consultorioId))
+          );
+        }
+
+        const selectedDoctorId = this.form.get('doctor_id')?.value;
+
+        if (selectedDoctorId) {
+          const exists = this.filteredDoctors().some(
+            (item) => Number(item.id) === Number(selectedDoctorId)
+          );
+
+          if (!exists) {
+            this.form.patchValue({ doctor_id: null }, { emitEvent: false });
+            this.slots.set([]);
+            this.selectedSlot.set(null);
+          }
+        }
+      });
+
+    this.form
       .get('doctor_id')
       ?.valueChanges.pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe(() => this.tryLoadAvailability());
+      .subscribe((doctorId) => {
+        this.selectedSlot.set(null);
+        this.slots.set([]);
+
+        if (!doctorId) {
+          return;
+        }
+
+        const doctor = this.filteredDoctors().find(
+          (item) => Number(item.id) === Number(doctorId)
+        );
+
+        if (doctor) {
+          this.form.patchValue(
+            { consultorio_id: doctor.consultorio_id },
+            { emitEvent: false }
+          );
+        }
+
+        this.tryLoadAvailability();
+      });
 
     this.form
       .get('fecha')
@@ -99,18 +175,11 @@ export class NuevaCita {
       .subscribe(() => this.tryLoadAvailability());
   }
 
-  getSelectedSpecialtyName(): string {
-    const specialtyId = this.form.get('specialty_id')?.value;
-
-    if (specialtyId === null || specialtyId === undefined) {
-      return '';
-    }
-
-    const specialty = this.specialties().find(
-      (item) => Number(item.id) === Number(specialtyId)
-    );
-
-    return specialty?.nombre ?? '';
+  private getTodayDate(): string {
+    const date = new Date();
+    const offset = date.getTimezoneOffset();
+    const localDate = new Date(date.getTime() - offset * 60000);
+    return localDate.toISOString().split('T')[0];
   }
 
   private loadSpecialties(): void {
@@ -128,17 +197,40 @@ export class NuevaCita {
   }
 
   private loadDoctors(specialtyId: number): void {
+    this.loadingDoctors.set(true);
+
     this.doctorsService
       .getAll(specialtyId)
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
-        next: (data) => this.doctors.set(data),
+        next: (data) => {
+          this.loadingDoctors.set(false);
+          this.doctors.set(data);
+          this.filteredDoctors.set(data);
+          this.consultorios.set(this.buildConsultoriosFromDoctors(data));
+        },
         error: (err) => {
+          this.loadingDoctors.set(false);
           this.notificationService.error(
             err?.error?.message || 'No se pudieron cargar los médicos.'
           );
         },
       });
+  }
+
+  private buildConsultoriosFromDoctors(doctors: Doctor[]): ConsultorioOption[] {
+    const map = new Map<number, ConsultorioOption>();
+
+    doctors.forEach((doctor) => {
+      if (!map.has(doctor.consultorio_id)) {
+        map.set(doctor.consultorio_id, {
+          id: doctor.consultorio_id,
+          nombre: doctor.consultorio_nombre,
+        });
+      }
+    });
+
+    return Array.from(map.values()).sort((a, b) => a.nombre.localeCompare(b.nombre));
   }
 
   private tryLoadAvailability(): void {
@@ -159,8 +251,8 @@ export class NuevaCita {
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: (data) => {
-          this.slots.set(data);
           this.loadingSlots.set(false);
+          this.slots.set(data);
 
           if (!data.length) {
             this.notificationService.info(
@@ -185,7 +277,7 @@ export class NuevaCita {
     if (this.form.invalid || !this.selectedSlot()) {
       this.form.markAllAsTouched();
       this.notificationService.error(
-        'Completa todos los campos y selecciona un horario.'
+        'Completa todos los campos y selecciona un horario disponible.'
       );
       return;
     }
@@ -199,21 +291,30 @@ export class NuevaCita {
     }
   }
 
+  cancelForm(): void {
+    this.form.reset({
+      specialty_id: null,
+      consultorio_id: null,
+      doctor_id: null,
+      fecha: '',
+      motivo_consulta: '',
+    });
+
+    this.doctors.set([]);
+    this.filteredDoctors.set([]);
+    this.consultorios.set([]);
+    this.slots.set([]);
+    this.selectedSlot.set(null);
+  }
+
   confirmCreateAppointment(): void {
     const slot = this.selectedSlot();
-
-    if (!slot) {
-      return;
-    }
-
     const doctorId = this.form.get('doctor_id')?.value;
     const fecha = this.form.get('fecha')?.value;
     const motivoConsulta = this.form.get('motivo_consulta')?.value;
 
-    if (!doctorId || !fecha || !motivoConsulta) {
-      this.notificationService.error(
-        'Faltan datos para registrar la cita.'
-      );
+    if (!slot || !doctorId || !fecha || !motivoConsulta) {
+      this.notificationService.error('Faltan datos para registrar la cita.');
       return;
     }
 
@@ -233,17 +334,7 @@ export class NuevaCita {
           this.submitting.set(false);
           this.showConfirmDialog.set(false);
           this.notificationService.success('Cita agendada correctamente.');
-
-          this.form.reset({
-            specialty_id: null,
-            doctor_id: null,
-            fecha: '',
-            motivo_consulta: '',
-          });
-
-          this.doctors.set([]);
-          this.slots.set([]);
-          this.selectedSlot.set(null);
+          this.cancelForm();
         },
         error: (err) => {
           this.submitting.set(false);

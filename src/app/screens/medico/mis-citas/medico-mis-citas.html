@@ -1,19 +1,75 @@
 <section class="appointments-page">
-  <div class="page-header">
-    <div>
-      <h1>Mis citas asignadas</h1>
-      <p>Gestiona el estado de tus citas médicas.</p>
-    </div>
-    <button type="button" class="btn-secondary" (click)="loadAppointments()">
-      Recargar
-    </button>
+  <div class="breadcrumb">
+    <span>Inicio</span>
+    <span class="separator">›</span>
+    <span class="current">Mis Citas</span>
   </div>
 
-  <div class="filters-card">
+  <header class="page-header">
+    <div>
+      <h1>Mis Citas Asignadas</h1>
+      <p>Consulta, filtra y administra las citas médicas asignadas.</p>
+    </div>
+
+    <div class="header-actions">
+      <button type="button" class="btn-outline" (click)="clearFilters()">
+        Limpiar filtros
+      </button>
+      <button type="button" class="btn-primary" (click)="loadAppointments()">
+        Recargar
+      </button>
+    </div>
+  </header>
+
+  <div class="stats-grid">
+    <article class="stat-card">
+      <span>Total</span>
+      <strong>{{ totalCitas() }}</strong>
+    </article>
+
+    <article class="stat-card info">
+      <span>Hoy</span>
+      <strong>{{ totalHoy() }}</strong>
+    </article>
+
+    <article class="stat-card warning">
+      <span>Pendientes</span>
+      <strong>{{ totalPendientes() }}</strong>
+    </article>
+
+    <article class="stat-card success">
+      <span>Confirmadas</span>
+      <strong>{{ totalConfirmadas() }}</strong>
+    </article>
+
+    <article class="stat-card done">
+      <span>Atendidas</span>
+      <strong>{{ totalAtendidas() }}</strong>
+    </article>
+  </div>
+
+  <section class="filters-card">
+    <div class="filters-header">
+      <div>
+        <h2>Filtros</h2>
+        <p>Busca citas por paciente, especialidad, consultorio, estado o fecha.</p>
+      </div>
+    </div>
+
     <div class="filters-grid">
       <div class="form-group">
+        <label for="search">Buscar</label>
+        <input
+          id="search"
+          type="text"
+          [(ngModel)]="search"
+          placeholder="Paciente, especialidad, motivo..."
+        />
+      </div>
+
+      <div class="form-group">
         <label for="estadoFiltro">Estado</label>
-        <select id="estadoFiltro" [(ngModel)]="estadoFiltro" (ngModelChange)="applyFilters()">
+        <select id="estadoFiltro" [(ngModel)]="estadoFiltro">
           <option value="">Todos</option>
           <option value="pendiente">Pendiente</option>
           <option value="confirmada">Confirmada</option>
@@ -24,10 +80,10 @@
 
       <div class="form-group">
         <label for="fechaFiltro">Fecha</label>
-        <input id="fechaFiltro" type="date" [(ngModel)]="fechaFiltro" (ngModelChange)="applyFilters()">
+        <input id="fechaFiltro" type="date" [(ngModel)]="fechaFiltro" />
       </div>
     </div>
-  </div>
+  </section>
 
   <div *ngIf="loading()" class="state-box">
     Cargando citas...
@@ -43,61 +99,70 @@
       *ngFor="let item of filteredAppointments(); trackBy: trackByAppointmentId"
     >
       <div class="card-top">
-        <h3>{{ item.fecha }} · {{ item.hora_inicio }} - {{ item.hora_fin }}</h3>
+        <div class="card-title-block">
+          <h3>{{ item.paciente_nombre }} {{ item.paciente_apellidos }}</h3>
+          <p>{{ item.fecha }} · {{ formatTime(item.hora_inicio) }} - {{ formatTime(item.hora_fin) }}</p>
+        </div>
+
         <app-appointment-status-chip [status]="item.estado"></app-appointment-status-chip>
       </div>
 
       <div class="card-body">
-        <div class="info-row">
-          <span class="label">Paciente:</span>
-          <span>{{ item.paciente_nombre }} {{ item.paciente_apellidos }}</span>
-        </div>
+        <div class="info-grid">
+          <div class="info-item">
+            <span class="label">Especialidad</span>
+            <strong>{{ item.specialty_nombre || 'Sin especialidad' }}</strong>
+          </div>
 
-        <div class="info-row">
-          <span class="label">Especialidad:</span>
-          <span>{{ item.specialty_nombre }}</span>
-        </div>
+          <div class="info-item">
+            <span class="label">Consultorio</span>
+            <strong>{{ item.consultorio_nombre || 'No asignado' }}</strong>
+          </div>
 
-        <div class="info-row">
-          <span class="label">Consultorio:</span>
-          <span>{{ item.consultorio_nombre }}</span>
-        </div>
+          <div class="info-item full">
+            <span class="label">Motivo de consulta</span>
+            <p>{{ item.motivo_consulta }}</p>
+          </div>
 
-        <div class="info-row">
-          <span class="label">Motivo:</span>
-          <span>{{ item.motivo_consulta }}</span>
+          <div
+            class="info-item full cancel-note"
+            *ngIf="item.estado === 'cancelada' && item.notas_cancelacion"
+          >
+            <span class="label">Nota de cancelación</span>
+            <p>{{ item.notas_cancelacion }}</p>
+          </div>
         </div>
       </div>
 
       <div class="card-actions">
         <button
           type="button"
-          class="btn-primary"
+          class="btn-action btn-primary"
           *ngIf="canConfirm(item)"
           [disabled]="processingId() === item.id"
           (click)="openActionDialog(item, 'confirm')"
         >
-          Confirmar
+          {{ processingId() === item.id ? 'Procesando...' : 'Confirmar' }}
         </button>
 
         <button
           type="button"
-          class="btn-success"
+          class="btn-action btn-success"
           *ngIf="canAttend(item)"
           [disabled]="processingId() === item.id"
           (click)="openActionDialog(item, 'attended')"
         >
-          Atendida
+          {{ processingId() === item.id ? 'Procesando...' : 'Atendida' }}
         </button>
 
         <button
           type="button"
-          class="btn-danger"
+          class="btn-action btn-danger"
           *ngIf="canCancel(item)"
           [disabled]="processingId() === item.id"
           (click)="openActionDialog(item, 'cancel')"
         >
-          Cancelar
+          {{ processingId() === item.id ? 'Procesando...' : 'Cancelar' }}
         </button>
       </div>
     </article>

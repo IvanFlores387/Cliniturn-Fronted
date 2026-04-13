@@ -21,9 +21,24 @@ export class AppointmentStatusChipComponent {
       case 'cancelada':
         return 'Cancelada';
       case 'atendida':
-        return 'Atendida';
+        return 'Completada';
       default:
-        return this.status;
+        return 'Pendiente';
+    }
+  }
+
+  get cssClass(): string {
+    switch (this.status) {
+      case 'pendiente':
+        return 'chip chip--warning';
+      case 'confirmada':
+        return 'chip chip--success';
+      case 'cancelada':
+        return 'chip chip--danger';
+      case 'atendida':
+        return 'chip chip--info';
+      default:
+        return 'chip';
     }
   }
 }

@@ -1,0 +1,441 @@
+:host {
+  display: block;
+}
+
+.medicos-page {
+  max-width: 1320px;
+  margin: 0 auto;
+}
+
+.breadcrumb {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: #64748b;
+  font-size: 0.9rem;
+  margin-bottom: 1rem;
+
+  .separator {
+    color: #94a3b8;
+  }
+
+  .current {
+    color: #0f172a;
+    font-weight: 600;
+  }
+}
+
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1rem;
+  margin-bottom: 1.4rem;
+
+  h1 {
+    margin: 0;
+    font-size: clamp(2rem, 2.4vw, 2.5rem);
+    color: #0f172a;
+    font-weight: 800;
+  }
+
+  p {
+    margin: 0.45rem 0 0;
+    color: #64748b;
+  }
+}
+
+.summary-grid,
+.filters-grid {
+  display: grid;
+  gap: 1rem;
+}
+
+.summary-grid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  margin-bottom: 1rem;
+}
+
+.summary-card,
+.filters-card,
+.table-card,
+.state-box,
+.modal-card {
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 20px;
+  box-shadow: 0 10px 30px rgba(15, 23, 42, 0.05);
+}
+
+.summary-card {
+  padding: 1rem 1.1rem;
+
+  span {
+    display: block;
+    color: #64748b;
+    margin-bottom: 0.45rem;
+  }
+
+  strong {
+    font-size: 1.9rem;
+    color: #0f172a;
+  }
+
+  &.success strong {
+    color: #15803d;
+  }
+
+  &.danger strong {
+    color: #dc2626;
+  }
+}
+
+.filters-card {
+  padding: 1.2rem;
+  margin-bottom: 1rem;
+}
+
+.filters-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1rem;
+  margin-bottom: 1rem;
+
+  h2 {
+    margin: 0;
+    color: #0f172a;
+    font-size: 1.05rem;
+  }
+
+  p {
+    margin: 0.35rem 0 0;
+    color: #64748b;
+  }
+}
+
+.filters-grid {
+  grid-template-columns: 1.5fr 1fr 1fr 1fr auto;
+  align-items: end;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+
+  &.full {
+    grid-column: 1 / -1;
+  }
+
+  label {
+    color: #0f172a;
+    font-weight: 600;
+  }
+}
+
+input,
+select,
+button {
+  font: inherit;
+}
+
+input,
+select {
+  width: 100%;
+  border: 1px solid #dbe2ea;
+  border-radius: 14px;
+  padding: 0.95rem 1rem;
+  background: #fff;
+  color: #0f172a;
+  outline: none;
+}
+
+input:focus,
+select:focus {
+  border-color: #2563eb;
+  box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.08);
+}
+
+.filter-actions {
+  display: flex;
+  align-items: end;
+}
+
+.btn-primary,
+.btn-outline,
+.btn-text {
+  font: inherit;
+  border-radius: 14px;
+  padding: 0.92rem 1.1rem;
+  font-weight: 700;
+}
+
+.btn-primary {
+  border: none;
+  background: #1d4ed8;
+  color: #fff;
+  cursor: pointer;
+}
+
+.btn-outline {
+  border: 1px solid #dbe2ea;
+  background: #fff;
+  color: #334155;
+  cursor: pointer;
+}
+
+.btn-text {
+  border: none;
+  background: transparent;
+  color: #1d4ed8;
+  cursor: pointer;
+}
+
+.state-box {
+  padding: 1.2rem;
+  color: #475569;
+
+  &.empty {
+    color: #64748b;
+  }
+}
+
+.table-card {
+  padding: 1rem;
+}
+
+.desktop-table {
+  overflow-x: auto;
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 950px;
+  }
+
+  th,
+  td {
+    text-align: left;
+    padding: 1rem 0.9rem;
+    border-bottom: 1px solid #eef2f7;
+    vertical-align: middle;
+  }
+
+  th {
+    color: #64748b;
+    font-size: 0.84rem;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+}
+
+.doctor-name {
+  strong {
+    display: block;
+    color: #0f172a;
+  }
+
+  small {
+    color: #64748b;
+  }
+}
+
+.status-chip {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 84px;
+  padding: 0.4rem 0.8rem;
+  border-radius: 999px;
+  font-size: 0.82rem;
+  font-weight: 700;
+
+  &.active {
+    background: #dcfce7;
+    color: #166534;
+  }
+
+  &.inactive {
+    background: #fee2e2;
+    color: #b91c1c;
+  }
+}
+
+.actions-inline {
+  display: flex;
+  gap: 0.85rem;
+}
+
+.btn-link {
+  border: none;
+  background: transparent;
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+  padding: 0;
+
+  &.primary {
+    color: #1d4ed8;
+  }
+
+  &.danger {
+    color: #dc2626;
+  }
+
+  &.success {
+    color: #15803d;
+  }
+}
+
+.mobile-cards {
+  display: none;
+}
+
+.doctor-card {
+  border: 1px solid #eef2f7;
+  border-radius: 18px;
+  padding: 1rem;
+  background: #fff;
+}
+
+.card-top,
+.card-actions,
+.modal-header,
+.modal-actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1rem;
+}
+
+.card-top h3,
+.modal-header h2 {
+  margin: 0;
+  color: #0f172a;
+}
+
+.card-top p,
+.modal-header p {
+  margin: 0.35rem 0 0;
+  color: #64748b;
+}
+
+.card-body {
+  margin: 1rem 0;
+  color: #334155;
+
+  p {
+    margin: 0.35rem 0;
+  }
+}
+
+.btn-toggle {
+  border: none;
+  border-radius: 14px;
+  padding: 0.92rem 1.1rem;
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.danger-bg {
+  background: #fee2e2;
+  color: #b91c1c;
+}
+
+.success-bg {
+  background: #dcfce7;
+  color: #166534;
+}
+
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  z-index: 2000;
+}
+
+.modal-card {
+  width: min(860px, 100%);
+  padding: 1.25rem;
+}
+
+.modal-form {
+  margin-top: 1rem;
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+.modal-actions {
+  margin-top: 1.25rem;
+}
+
+.icon-close {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  border: none;
+  background: #f8fafc;
+  color: #0f172a;
+  cursor: pointer;
+  font-size: 1.6rem;
+  line-height: 1;
+}
+
+@media (max-width: 1100px) {
+  .filters-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+@media (max-width: 992px) {
+  .form-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .filter-actions {
+    align-items: stretch;
+  }
+}
+
+@media (max-width: 768px) {
+  .page-header,
+  .filters-header,
+  .modal-header,
+  .modal-actions,
+  .card-top,
+  .card-actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .summary-grid,
+  .filters-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .desktop-table {
+    display: none;
+  }
+
+  .mobile-cards {
+    display: grid;
+    gap: 1rem;
+  }
+
+  .btn-primary,
+  .btn-outline,
+  .btn-toggle {
+    width: 100%;
+    text-align: center;
+  }
+}

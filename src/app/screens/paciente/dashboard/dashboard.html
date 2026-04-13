@@ -1,72 +1,103 @@
 <section class="dashboard-page">
-  <div class="page-header">
+  <div class="breadcrumb">
+    <span>Inicio</span>
+    <span class="separator">›</span>
+    <span class="current">Dashboard</span>
+  </div>
+
+  <header class="page-header">
     <div>
-      <p class="breadcrumb">Dashboard</p>
-      <h1>Bienvenido, {{ firstName() }}</h1>
-      <p class="subtitle">Aquí puedes ver y gestionar tus citas médicas</p>
+      <h1>Dashboard del Paciente</h1>
+      <p>Consulta el resumen de tus citas y tu próxima atención médica.</p>
     </div>
-  </div>
 
-  <div class="stats-grid">
-    <article class="stat-card" *ngFor="let stat of stats" [ngClass]="stat.tone">
-      <div>
-        <p>{{ stat.label }}</p>
-        <h3>{{ stat.value }}</h3>
-      </div>
-      <lucide-icon [name]="stat.icon"></lucide-icon>
-    </article>
-  </div>
+    <div class="header-actions">
+      <a routerLink="/paciente/nueva-cita" class="btn-primary-link">Nueva cita</a>
+      <button type="button" class="btn-outline" (click)="loadDashboard()">Recargar</button>
+    </div>
+  </header>
 
-  <div class="action-row">
-    <button class="primary-btn">
-      <lucide-icon name="badge-plus"></lucide-icon>
-      Agendar Nueva Cita
-    </button>
-  </div>
+  <div *ngIf="loading()" class="state-box">Cargando dashboard...</div>
 
-  <section class="section-block">
-    <h2>Próximas Citas</h2>
+  <ng-container *ngIf="!loading() && dashboard() as data">
+    <div class="stats-grid">
+      <article class="stat-card">
+        <span>Total de citas</span>
+        <strong>{{ data.totals.total_citas }}</strong>
+      </article>
 
-    <div class="cards-grid">
-      <article class="appointment-card" *ngFor="let item of upcomingAppointments">
-        <div class="card-top">
-          <h3>{{ item.especialidad }}</h3>
-          <span class="badge" [ngClass]="item.tone">{{ item.estado }}</span>
-        </div>
+      <article class="stat-card warning">
+        <span>Pendientes</span>
+        <strong>{{ data.totals.pendientes }}</strong>
+      </article>
 
-        <ul>
-          <li><strong>Médico:</strong> {{ item.medico }}</li>
-          <li><strong>Fecha:</strong> {{ item.fecha }}</li>
-          <li><strong>Hora:</strong> {{ item.hora }}</li>
-          <li><strong>Consultorio:</strong> {{ item.consultorio }}</li>
-          <li><strong>Motivo:</strong> {{ item.motivo }}</li>
-        </ul>
+      <article class="stat-card success">
+        <span>Confirmadas</span>
+        <strong>{{ data.totals.confirmadas }}</strong>
+      </article>
+
+      <article class="stat-card info">
+        <span>Atendidas</span>
+        <strong>{{ data.totals.atendidas }}</strong>
+      </article>
+
+      <article class="stat-card danger">
+        <span>Canceladas</span>
+        <strong>{{ data.totals.canceladas }}</strong>
       </article>
     </div>
-  </section>
 
-  <section class="section-block">
-    <h2>Historial de Citas</h2>
-
-    <div class="cards-grid">
-      <article class="appointment-card" *ngFor="let item of historyAppointments">
-        <div class="card-top">
-          <h3>{{ item.especialidad }}</h3>
-          <span class="badge" [ngClass]="item.tone">{{ item.estado }}</span>
+    <div class="content-grid">
+      <section class="panel-card">
+        <div class="panel-header">
+          <h2>Próxima cita</h2>
+          <p>Tu siguiente atención programada.</p>
         </div>
 
-        <ul>
-          <li><strong>Médico:</strong> {{ item.medico }}</li>
-          <li><strong>Fecha:</strong> {{ item.fecha }}</li>
-          <li><strong>Hora:</strong> {{ item.hora }}</li>
-          <li><strong>Consultorio:</strong> {{ item.consultorio }}</li>
-          <li><strong>Motivo:</strong> {{ item.motivo }}</li>
-        </ul>
-
-        <div class="cancel-box" *ngIf="item.cancelacion">
-          <strong>Motivo de cancelación:</strong> {{ item.cancelacion }}
+        <div *ngIf="!data.next_appointment" class="state-box empty">
+          No tienes una próxima cita programada.
         </div>
-      </article>
+
+        <div class="next-card" *ngIf="data.next_appointment as next">
+          <div class="next-top">
+            <div>
+              <h3>{{ next.specialty_nombre }}</h3>
+              <p>{{ next.fecha }} · {{ formatTime(next.hora_inicio) }} - {{ formatTime(next.hora_fin) }}</p>
+            </div>
+
+            <app-appointment-status-chip [status]="toAppointmentStatus(next.estado)"></app-appointment-status-chip>
+          </div>
+
+          <div class="next-body">
+            <p><strong>Médico:</strong> {{ next.doctor_nombre }} {{ next.doctor_apellidos }}</p>
+            <p><strong>Consultorio:</strong> {{ next.consultorio_nombre }}</p>
+            <p><strong>Motivo:</strong> {{ next.motivo_consulta }}</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="panel-card">
+        <div class="panel-header">
+          <h2>Actividad reciente</h2>
+          <p>Tus últimas citas registradas.</p>
+        </div>
+
+        <div *ngIf="!data.recent_appointments.length" class="state-box empty">
+          Aún no tienes citas registradas.
+        </div>
+
+        <div class="recent-list" *ngIf="data.recent_appointments.length">
+          <article class="recent-item" *ngFor="let item of data.recent_appointments">
+            <div>
+              <strong>{{ item.specialty_nombre }}</strong>
+              <p>{{ item.fecha }} · {{ formatTime(item.hora_inicio) }} - {{ formatTime(item.hora_fin) }}</p>
+              <small>{{ item.doctor_nombre }} {{ item.doctor_apellidos }}</small>
+            </div>
+
+            <app-appointment-status-chip [status]="toAppointmentStatus(item.estado)"></app-appointment-status-chip>
+          </article>
+        </div>
+      </section>
     </div>
-  </section>
+  </ng-container>
 </section>

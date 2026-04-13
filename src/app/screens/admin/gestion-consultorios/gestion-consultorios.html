@@ -1,1 +1,155 @@
-<p>gestion-consultorios works!</p>
+<section class="consultorios-page">
+  <div class="breadcrumb">
+    <span>Inicio</span>
+    <span class="separator">›</span>
+    <span class="current">Gestión de Consultorios</span>
+  </div>
+
+  <header class="page-header">
+    <div>
+      <h1>Gestión de Consultorios</h1>
+      <p>Administra los consultorios disponibles del centro médico.</p>
+    </div>
+
+    <button type="button" class="btn-primary" (click)="openCreateModal()">
+      Agregar consultorio
+    </button>
+  </header>
+
+  <div class="summary-grid">
+    <article class="summary-card">
+      <span>Total de consultorios</span>
+      <strong>{{ consultorios().length }}</strong>
+    </article>
+
+    <article class="summary-card success">
+      <span>Consultorios activos</span>
+      <strong>{{ consultorios().filter(c => c.activo === 1).length }}</strong>
+    </article>
+
+    <article class="summary-card danger">
+      <span>Consultorios inactivos</span>
+      <strong>{{ consultorios().filter(c => c.activo === 0).length }}</strong>
+    </article>
+  </div>
+
+  <section class="filters-card">
+    <div class="filters-header">
+      <div>
+        <h2>Filtros</h2>
+        <p>Busca por nombre, ubicación, descripción o estado.</p>
+      </div>
+
+      <button type="button" class="btn-text" (click)="clearFilters()">
+        Limpiar filtros
+      </button>
+    </div>
+
+    <div class="filters-grid">
+      <div class="form-group">
+        <label for="search">Buscar</label>
+        <input id="search" type="text" [(ngModel)]="search" placeholder="Nombre o ubicación" />
+      </div>
+
+      <div class="form-group">
+        <label for="activoFiltro">Estado</label>
+        <select id="activoFiltro" [(ngModel)]="activoFiltro">
+          <option [ngValue]="''">Todos</option>
+          <option [ngValue]="1">Activos</option>
+          <option [ngValue]="0">Inactivos</option>
+        </select>
+      </div>
+
+      <div class="filter-actions">
+        <button type="button" class="btn-outline" (click)="applyFilters()">Aplicar</button>
+      </div>
+    </div>
+  </section>
+
+  <div *ngIf="loading()" class="state-box">Cargando consultorios...</div>
+
+  <div *ngIf="!loading() && !consultorios().length" class="state-box empty">
+    No hay consultorios registrados con los filtros actuales.
+  </div>
+
+  <section class="cards-grid" *ngIf="!loading() && consultorios().length">
+    <article class="consultorio-card" *ngFor="let item of consultorios(); trackBy: trackById">
+      <div class="card-header">
+        <div>
+          <h3>{{ item.nombre }}</h3>
+          <span class="status-chip" [class.active]="item.activo === 1" [class.inactive]="item.activo === 0">
+            {{ item.activo === 1 ? 'Activo' : 'Inactivo' }}
+          </span>
+        </div>
+
+        <div class="icon-box">🏥</div>
+      </div>
+
+      <div class="card-body">
+        <p><strong>Ubicación:</strong> {{ item.ubicacion || 'Sin ubicación registrada' }}</p>
+        <p><strong>Descripción:</strong> {{ item.descripcion || 'Sin descripción registrada' }}</p>
+        <p><strong>Médicos asociados:</strong> {{ item.total_medicos ?? 0 }}</p>
+      </div>
+
+      <div class="card-actions">
+        <button type="button" class="btn-primary" (click)="openEditModal(item)">Editar</button>
+        <button
+          type="button"
+          class="btn-toggle"
+          [class.danger-bg]="item.activo === 1"
+          [class.success-bg]="item.activo === 0"
+          (click)="toggleStatus(item)"
+        >
+          {{ item.activo === 1 ? 'Desactivar' : 'Activar' }}
+        </button>
+      </div>
+    </article>
+  </section>
+
+  <div class="modal-backdrop" *ngIf="modalVisible()">
+    <div class="modal-card">
+      <div class="modal-header">
+        <div>
+          <h2>{{ isEditing() ? 'Editar consultorio' : 'Nuevo consultorio' }}</h2>
+          <p>Completa la información del consultorio.</p>
+        </div>
+
+        <button type="button" class="icon-close" (click)="closeModal()">×</button>
+      </div>
+
+      <form class="modal-form" [formGroup]="form" (ngSubmit)="save()">
+        <div class="form-grid">
+          <div class="form-group full">
+            <label for="nombre">Nombre *</label>
+            <input id="nombre" type="text" formControlName="nombre" />
+          </div>
+
+          <div class="form-group">
+            <label for="ubicacion">Ubicación</label>
+            <input id="ubicacion" type="text" formControlName="ubicacion" />
+          </div>
+
+          <div class="form-group">
+            <label for="activo">Estado</label>
+            <select id="activo" formControlName="activo">
+              <option [ngValue]="1">Activo</option>
+              <option [ngValue]="0">Inactivo</option>
+            </select>
+          </div>
+
+          <div class="form-group full">
+            <label for="descripcion">Descripción</label>
+            <textarea id="descripcion" rows="4" formControlName="descripcion"></textarea>
+          </div>
+        </div>
+
+        <div class="modal-actions">
+          <button type="button" class="btn-outline" (click)="closeModal()">Cancelar</button>
+          <button type="submit" class="btn-primary" [disabled]="submitting()">
+            {{ submitting() ? 'Guardando...' : (isEditing() ? 'Actualizar consultorio' : 'Crear consultorio') }}
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</section>

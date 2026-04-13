@@ -1,56 +1,75 @@
-import { Component, computed, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { LucideAngularModule } from 'lucide-angular';
-import { AuthService } from '../../../services/auth.service';
+import { Component, DestroyRef, inject, signal } from '@angular/core';
+import { RouterModule } from '@angular/router';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+
+import { DashboardService } from '../../../services/dashboard.service';
+import { NotificationService } from '../../../services/notification.service';
+import { AdminDashboardData } from '../../../core/models/dashboard.model';
+import { AppointmentStatus } from '../../../core/models/appointment.model';
+import { AppointmentStatusChipComponent } from '../../../shared/components/appointment-status-chip/appointment-status-chip';
 
 @Component({
-  selector: 'app-dashboard',
+  selector: 'app-admin-dashboard',
   standalone: true,
-  imports: [CommonModule, LucideAngularModule],
+  imports: [CommonModule, RouterModule, AppointmentStatusChipComponent],
   templateUrl: './dashboard.html',
-  styleUrl: './dashboard.scss'
+  styleUrl: './dashboard.scss',
 })
-export class Dashboard {
-  private readonly authService = inject(AuthService);
+export class AdminDashboardComponent {
+  private readonly dashboardService = inject(DashboardService);
+  private readonly notificationService = inject(NotificationService);
+  private readonly destroyRef = inject(DestroyRef);
 
-  readonly currentUser = computed(() => this.authService.user());
-  readonly adminName = computed(() => this.currentUser()?.nombre ?? 'Administrador');
+  readonly loading = signal(true);
+  readonly dashboard = signal<AdminDashboardData | null>(null);
 
-  stats = [
-    { label: 'Total de Citas', value: 4, icon: 'calendar', tone: 'blue' },
-    { label: 'Citas Pendientes', value: 1, icon: 'circle-alert', tone: 'yellow' },
-    { label: 'Citas Confirmadas', value: 1, icon: 'check-circle2', tone: 'green' },
-    { label: 'Tasa de Cancelación', value: '25%', icon: 'trending-up', tone: 'red' }
-  ];
+  constructor() {
+    this.loadDashboard();
+  }
 
-  shortcuts = [
-    {
-      title: 'Gestionar Médicos',
-      value: 4,
-      description: 'Ver, agregar y editar información de médicos',
-      icon: 'users',
-      tone: 'blue'
-    },
-    {
-      title: 'Gestionar Consultorios',
-      value: 5,
-      description: 'Ver, agregar y editar consultorios disponibles',
-      icon: 'building2',
-      tone: 'green'
-    },
-    {
-      title: 'Ver Reportes Detallados',
-      value: null,
-      description: 'Análisis estadístico completo del sistema',
-      icon: 'clipboard-list',
-      tone: 'purple'
+  loadDashboard(): void {
+    this.loading.set(true);
+
+    this.dashboardService
+      .getAdminDashboard()
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (data) => {
+          this.dashboard.set(data);
+          this.loading.set(false);
+        },
+        error: (err) => {
+          this.loading.set(false);
+          this.notificationService.error(
+            err?.error?.message || 'No se pudo cargar el dashboard del administrador.'
+          );
+        },
+      });
+  }
+
+  formatTime(value: string): string {
+    return value?.slice(0, 5) || value;
+  }
+
+  toAppointmentStatus(status: string | null | undefined): AppointmentStatus {
+    const normalized = (status ?? '').trim().toLowerCase();
+
+    switch (normalized) {
+      case 'pendiente':
+        return 'pendiente';
+      case 'confirmada':
+      case 'confirmado':
+        return 'confirmada';
+      case 'cancelada':
+      case 'cancelado':
+        return 'cancelada';
+      case 'atendida':
+      case 'completada':
+      case 'completado':
+        return 'atendida';
+      default:
+        return 'pendiente';
     }
-  ];
-
-  summary = [
-    { label: 'Pendientes', value: 1, tone: 'yellow' },
-    { label: 'Confirmadas', value: 1, tone: 'green' },
-    { label: 'Completadas', value: 1, tone: 'blue' },
-    { label: 'Canceladas', value: 1, tone: 'red' }
-  ];
+  }
 }

@@ -1,33 +1,103 @@
 <section class="dashboard-page">
-  <div class="page-header">
-    <p class="breadcrumb">Dashboard</p>
-    <h1>Bienvenido, {{ doctorName() }}</h1>
-    <p class="subtitle">{{ doctorSubtitle() }}</p>
+  <div class="breadcrumb">
+    <span>Inicio</span>
+    <span class="separator">›</span>
+    <span class="current">Dashboard</span>
   </div>
 
-  <div class="stats-grid">
-    <article class="stat-card" *ngFor="let stat of stats" [ngClass]="stat.tone">
-      <div>
-        <p>{{ stat.label }}</p>
-        <h3>{{ stat.value }}</h3>
-      </div>
-      <lucide-icon [name]="stat.icon"></lucide-icon>
-    </article>
-  </div>
-
-  <section class="section-block">
-    <h2>Citas de Hoy</h2>
-    <div class="empty-state">
-      <lucide-icon name="calendar-days"></lucide-icon>
-      <p>No tienes citas programadas para hoy</p>
+  <header class="page-header">
+    <div>
+      <h1>Dashboard del Médico</h1>
+      <p>Consulta tu agenda, próximas citas y resumen general.</p>
     </div>
-  </section>
 
-  <section class="section-block">
-    <h2>Próximas Citas</h2>
-    <div class="empty-state">
-      <lucide-icon name="calendar-days"></lucide-icon>
-      <p>No hay citas próximas</p>
+    <div class="header-actions">
+      <a routerLink="/medico/mis-citas" class="btn-primary-link">Ver mis citas</a>
+      <button type="button" class="btn-outline" (click)="loadDashboard()">Recargar</button>
     </div>
-  </section>
+  </header>
+
+  <div *ngIf="loading()" class="state-box">Cargando dashboard...</div>
+
+  <ng-container *ngIf="!loading() && dashboard() as data">
+    <div class="stats-grid">
+      <article class="stat-card">
+        <span>Total de citas</span>
+        <strong>{{ data.totals.total_citas }}</strong>
+      </article>
+
+      <article class="stat-card info">
+        <span>Citas de hoy</span>
+        <strong>{{ data.totals.citas_hoy }}</strong>
+      </article>
+
+      <article class="stat-card warning">
+        <span>Pendientes</span>
+        <strong>{{ data.totals.pendientes }}</strong>
+      </article>
+
+      <article class="stat-card success">
+        <span>Confirmadas</span>
+        <strong>{{ data.totals.confirmadas }}</strong>
+      </article>
+
+      <article class="stat-card done">
+        <span>Atendidas</span>
+        <strong>{{ data.totals.atendidas }}</strong>
+      </article>
+
+      <article class="stat-card danger">
+        <span>Canceladas</span>
+        <strong>{{ data.totals.canceladas }}</strong>
+      </article>
+    </div>
+
+    <div class="content-grid">
+      <section class="panel-card">
+        <div class="panel-header">
+          <h2>Agenda de hoy</h2>
+          <p>Las citas programadas para el día actual.</p>
+        </div>
+
+        <div *ngIf="!data.today_appointments.length" class="state-box empty">
+          No tienes citas registradas para hoy.
+        </div>
+
+        <div class="appointment-list" *ngIf="data.today_appointments.length">
+          <article class="appointment-item" *ngFor="let item of data.today_appointments">
+            <div>
+              <strong>{{ item.paciente_nombre }} {{ item.paciente_apellidos }}</strong>
+              <p>{{ formatTime(item.hora_inicio) }} - {{ formatTime(item.hora_fin) }} · {{ item.specialty_nombre }}</p>
+              <small>{{ item.consultorio_nombre }}</small>
+            </div>
+
+            <app-appointment-status-chip [status]="toAppointmentStatus(item.estado)"></app-appointment-status-chip>
+          </article>
+        </div>
+      </section>
+
+      <section class="panel-card">
+        <div class="panel-header">
+          <h2>Próximas citas</h2>
+          <p>Tus próximas atenciones pendientes o confirmadas.</p>
+        </div>
+
+        <div *ngIf="!data.upcoming_appointments.length" class="state-box empty">
+          No hay próximas citas disponibles.
+        </div>
+
+        <div class="appointment-list" *ngIf="data.upcoming_appointments.length">
+          <article class="appointment-item" *ngFor="let item of data.upcoming_appointments">
+            <div>
+              <strong>{{ item.paciente_nombre }} {{ item.paciente_apellidos }}</strong>
+              <p>{{ item.fecha }} · {{ formatTime(item.hora_inicio) }} - {{ formatTime(item.hora_fin) }}</p>
+              <small>{{ item.consultorio_nombre }}</small>
+            </div>
+
+            <app-appointment-status-chip [status]="toAppointmentStatus(item.estado)"></app-appointment-status-chip>
+          </article>
+        </div>
+      </section>
+    </div>
+  </ng-container>
 </section>

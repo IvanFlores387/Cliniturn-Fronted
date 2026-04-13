@@ -10,16 +10,17 @@ import { NuevaCita } from './screens/paciente/nueva-cita/nueva-cita';
 import { Expediente as PacienteExpedienteComponent } from './screens/paciente/expediente/expediente';
 import { Estadisticas } from './screens/paciente/estadisticas/estadisticas';
 
-import { Dashboard as MedicoDashboardComponent } from './screens/medico/dashboard/dashboard';
+import { MedicoDashboardComponent as MedicoDashboardComponent } from './screens/medico/dashboard/dashboard';
 import { CitasHoy } from './screens/medico/citas-hoy/citas-hoy';
 import { ProximasCitas } from './screens/medico/proximas-citas/proximas-citas';
-import { Expedientes as MedicoExpedientesComponent } from './screens/medico/expedientes/expedientes';
+import { ExpedientesComponent as MedicoExpedientesComponent } from './screens/medico/expedientes/expedientes';
 
-import { Dashboard as AdminDashboardComponent } from './screens/admin/dashboard/dashboard';
+import { AdminDashboardComponent as AdminDashboardComponent } from './screens/admin/dashboard/dashboard';
 import { GestionMedicos } from './screens/admin/gestion-medicos/gestion-medicos';
 import { GestionConsultorios } from './screens/admin/gestion-consultorios/gestion-consultorios';
-import { Reportes as AdminReportesComponent } from './screens/admin/reportes/reportes';
-import { Expedientes as AdminExpedientesComponent } from './screens/admin/expedientes/expedientes';
+import { ReportesComponent as AdminReportesComponent } from './screens/admin/reportes/reportes';
+import { ExpedientesAdminComponent as AdminExpedientesComponent } from './screens/admin/expedientes/expedientes';
+import { HorariosMedicosComponent } from './screens/admin/horarios-medicos/horarios-medicos';
 
 import { authGuard } from './core/guards/auth.guard';
 import { roleGuard } from './core/guards/role.guard';
@@ -101,6 +102,7 @@ export const routes: Routes = [
             m => m.AdminCitasComponent
           )
       },
+      { path: 'horarios-medicos', component: HorariosMedicosComponent },
       { path: '', redirectTo: 'dashboard', pathMatch: 'full' }
     ]
   },

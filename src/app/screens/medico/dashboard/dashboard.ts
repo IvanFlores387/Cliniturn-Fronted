@@ -1,36 +1,79 @@
-import { Component, computed, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { LucideAngularModule } from 'lucide-angular';
-import { AuthService } from '../../../services/auth.service';
+import { Component, DestroyRef, inject, signal } from '@angular/core';
+import { RouterModule } from '@angular/router';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+
+import { DashboardService } from '../../../services/dashboard.service';
+import { NotificationService } from '../../../services/notification.service';
+import { DoctorDashboardData } from '../../../core/models/dashboard.model';
+import { AppointmentStatus } from '../../../core/models/appointment.model';
+import { AppointmentStatusChipComponent } from '../../../shared/components/appointment-status-chip/appointment-status-chip';
 
 @Component({
-  selector: 'app-dashboard',
+  selector: 'app-medico-dashboard',
   standalone: true,
-  imports: [CommonModule, LucideAngularModule],
+  imports: [CommonModule, RouterModule, AppointmentStatusChipComponent],
   templateUrl: './dashboard.html',
-  styleUrl: './dashboard.scss'
+  styleUrl: './dashboard.scss',
 })
-export class Dashboard {
-  private readonly authService = inject(AuthService);
+export class MedicoDashboardComponent {
+  private readonly dashboardService = inject(DashboardService);
+  private readonly notificationService = inject(NotificationService);
+  private readonly destroyRef = inject(DestroyRef);
 
-  readonly currentUser = computed(() => this.authService.user());
+  readonly loading = signal(true);
+  readonly dashboard = signal<DoctorDashboardData | null>(null);
 
-  readonly doctorName = computed(() => {
-    const nombre = this.currentUser()?.nombre ?? 'Médico';
-    return nombre.startsWith('Dr.') || nombre.startsWith('Dra.') ? nombre : `Dr. ${nombre}`;
-  });
+  constructor() {
+    this.loadDashboard();
+  }
 
-  readonly doctorSubtitle = computed(() => {
-    const user = this.currentUser();
-    const especialidad = user?.especialidad || 'Especialidad no definida';
-    const cedula = user?.cedula || 'Sin cédula registrada';
-    return `${especialidad} - Cédula: ${cedula}`;
-  });
+  loadDashboard(): void {
+    this.loading.set(true);
 
-  stats = [
-    { label: 'Total de Citas', value: 2, icon: 'calendar', tone: 'blue' },
-    { label: 'Pendientes', value: 0, icon: 'circle-alert', tone: 'yellow' },
-    { label: 'Confirmadas', value: 1, icon: 'check-circle2', tone: 'green' },
-    { label: 'Completadas', value: 1, icon: 'activity', tone: 'purple' }
-  ];
+    this.dashboardService
+      .getDoctorDashboard()
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (data) => {
+          this.dashboard.set(data);
+          this.loading.set(false);
+        },
+        error: (err) => {
+          this.loading.set(false);
+          this.notificationService.error(
+            err?.error?.message || 'No se pudo cargar el dashboard del médico.'
+          );
+        },
+      });
+  }
+
+  formatTime(value: string): string {
+    return value?.slice(0, 5) || value;
+  }
+
+  toAppointmentStatus(status: string | null | undefined): AppointmentStatus {
+    const normalized = (status ?? '').trim().toLowerCase();
+
+    switch (normalized) {
+      case 'pendiente':
+        return 'pendiente';
+
+      case 'confirmada':
+      case 'confirmado':
+        return 'confirmada';
+
+      case 'cancelada':
+      case 'cancelado':
+        return 'cancelada';
+
+      case 'atendida':
+      case 'completada':
+      case 'completado':
+        return 'atendida';
+
+      default:
+        return 'pendiente';
+    }
+  }
 }

@@ -1,0 +1,199 @@
+<section class="horarios-page">
+  <div class="breadcrumb">
+    <span>Inicio</span>
+    <span class="separator">›</span>
+    <span>Administrador</span>
+    <span class="separator">›</span>
+    <span class="current">Horarios Médicos</span>
+  </div>
+
+  <header class="page-header">
+    <div>
+      <h1>Horarios por Médico</h1>
+      <p>Asigna, edita y elimina horarios de atención por médico.</p>
+    </div>
+
+    <button type="button" class="btn-primary" (click)="openCreateModal()">
+      Nuevo horario
+    </button>
+  </header>
+
+  <div class="page-layout">
+    <aside class="doctors-card">
+      <div class="panel-header">
+        <h2>Médicos</h2>
+        <p>Selecciona un médico para administrar sus horarios.</p>
+      </div>
+
+      <div class="search-box">
+        <input
+          type="text"
+          [(ngModel)]="searchDoctor"
+          placeholder="Buscar médico, especialidad o consultorio"
+        />
+      </div>
+
+      <div *ngIf="loadingDoctors()" class="state-box">
+        Cargando médicos...
+      </div>
+
+      <div
+        class="doctor-list"
+        *ngIf="!loadingDoctors() && filteredDoctors().length"
+      >
+        <button
+          type="button"
+          class="doctor-item"
+          *ngFor="let item of filteredDoctors(); trackBy: trackByDoctorId"
+          [class.active]="selectedDoctorId() === item.id"
+          (click)="selectDoctor(item)"
+        >
+          <strong>{{ item.nombre }} {{ item.apellidos }}</strong>
+          <span>{{ item.specialty_nombre }}</span>
+          <small>{{ item.consultorio_nombre }}</small>
+        </button>
+      </div>
+
+      <div
+        *ngIf="!loadingDoctors() && !filteredDoctors().length"
+        class="state-box empty"
+      >
+        No hay médicos disponibles.
+      </div>
+    </aside>
+
+    <section class="schedules-card">
+      <div class="panel-header">
+        <div>
+          <h2>Horarios registrados</h2>
+          <p *ngIf="selectedDoctorId()">
+            Médico seleccionado: <strong>{{ selectedDoctorName() }}</strong>
+          </p>
+          <p *ngIf="!selectedDoctorId()">
+            Selecciona un médico para ver y administrar sus horarios.
+          </p>
+        </div>
+      </div>
+
+      <div *ngIf="loadingSchedules()" class="state-box">
+        Cargando horarios...
+      </div>
+
+      <div *ngIf="!selectedDoctorId()" class="state-box empty">
+        Aún no has seleccionado un médico.
+      </div>
+
+      <div
+        *ngIf="selectedDoctorId() && !loadingSchedules() && !groupedSchedules().length"
+        class="state-box empty"
+      >
+        El médico seleccionado no tiene horarios registrados.
+      </div>
+
+      <div
+        class="days-grid"
+        *ngIf="selectedDoctorId() && !loadingSchedules() && groupedSchedules().length"
+      >
+        <article class="day-card" *ngFor="let group of groupedSchedules()">
+          <div class="day-header">
+            <h3>{{ group.nombreDia }}</h3>
+            <span>{{ group.items.length }} horario(s)</span>
+          </div>
+
+          <div class="schedule-list">
+            <div
+              class="schedule-item"
+              *ngFor="let item of group.items; trackBy: trackByScheduleId"
+            >
+              <div class="schedule-info">
+                <strong>
+                  {{ formatTime(item.hora_inicio) }} - {{ formatTime(item.hora_fin) }}
+                </strong>
+                <span
+                  class="status-chip"
+                  [class.active]="item.activo === 1"
+                  [class.inactive]="item.activo === 0"
+                >
+                  {{ item.activo === 1 ? 'Activo' : 'Inactivo' }}
+                </span>
+              </div>
+
+              <div class="schedule-actions">
+                <button type="button" class="btn-small btn-edit" (click)="openEditModal(item)">
+                  Editar
+                </button>
+                <button type="button" class="btn-small btn-danger" (click)="deleteSchedule(item)">
+                  Eliminar
+                </button>
+              </div>
+            </div>
+          </div>
+        </article>
+      </div>
+    </section>
+  </div>
+
+  <div class="modal-backdrop" *ngIf="modalVisible()">
+    <div class="modal-card">
+      <div class="modal-header">
+        <div>
+          <h2>{{ isEditing() ? 'Editar horario' : 'Nuevo horario' }}</h2>
+          <p>Configura el día y el rango horario para el médico seleccionado.</p>
+        </div>
+
+        <button type="button" class="icon-close" (click)="closeModal()">×</button>
+      </div>
+
+      <form class="modal-form" [formGroup]="form" (ngSubmit)="save()">
+        <div class="form-grid">
+          <div class="form-group">
+            <label for="dia_semana">Día de la semana *</label>
+            <select id="dia_semana" formControlName="dia_semana">
+              <option [ngValue]="null">Selecciona un día</option>
+              <option *ngFor="let item of days" [ngValue]="item.value">
+                {{ item.label }}
+              </option>
+            </select>
+            <small class="error-text" *ngIf="form.get('dia_semana')?.touched && form.get('dia_semana')?.invalid">
+              El día es obligatorio.
+            </small>
+          </div>
+
+          <div class="form-group">
+            <label for="activo">Estado</label>
+            <select id="activo" formControlName="activo">
+              <option [ngValue]="1">Activo</option>
+              <option [ngValue]="0">Inactivo</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="hora_inicio">Hora inicio *</label>
+            <input id="hora_inicio" type="time" formControlName="hora_inicio" />
+            <small class="error-text" *ngIf="form.get('hora_inicio')?.touched && form.get('hora_inicio')?.invalid">
+              La hora de inicio es obligatoria.
+            </small>
+          </div>
+
+          <div class="form-group">
+            <label for="hora_fin">Hora fin *</label>
+            <input id="hora_fin" type="time" formControlName="hora_fin" />
+            <small class="error-text" *ngIf="form.get('hora_fin')?.touched && form.get('hora_fin')?.invalid">
+              La hora de fin es obligatoria.
+            </small>
+          </div>
+        </div>
+
+        <div class="modal-actions">
+          <button type="button" class="btn-outline" (click)="closeModal()">
+            Cancelar
+          </button>
+
+          <button type="submit" class="btn-primary" [disabled]="submitting()">
+            {{ submitting() ? 'Guardando...' : (isEditing() ? 'Actualizar horario' : 'Crear horario') }}
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</section>

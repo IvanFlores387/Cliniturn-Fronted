@@ -1,7 +1,7 @@
 <aside class="sidebar">
   <nav class="menu">
     <a
-      *ngFor="let item of menu"
+      *ngFor="let item of menu()"
       [routerLink]="item.route"
       routerLinkActive="active"
       class="menu-item"
@@ -10,4 +10,10 @@
       <span>{{ item.label }}</span>
     </a>
   </nav>
+
+  <div class="sidebar-footer" *ngIf="currentUser()">
+    <strong>{{ userName }}</strong>
+    <small>{{ userRoleLabel }}</small>
+    <small *ngIf="extraInfo">{{ extraInfo }}</small>
+  </div>
 </aside>

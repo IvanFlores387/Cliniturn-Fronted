@@ -1,61 +1,76 @@
 <section class="dashboard-page">
-  <div class="page-header">
-    <p class="breadcrumb">Dashboard</p>
-    <h1>Bienvenido, {{ adminName() }}</h1>
-    <p class="subtitle">Panel de Administración de CliniTurn</p>
+  <div class="breadcrumb">
+    <span>Inicio</span>
+    <span class="separator">›</span>
+    <span class="current">Dashboard</span>
   </div>
 
-  <div class="stats-grid">
-    <article class="stat-card" *ngFor="let stat of stats" [ngClass]="stat.tone">
-      <div>
-        <p>{{ stat.label }}</p>
-        <h3>{{ stat.value }}</h3>
-      </div>
-      <lucide-icon [name]="stat.icon"></lucide-icon>
-    </article>
-  </div>
+  <header class="page-header">
+    <div>
+      <h1>Dashboard del Administrador</h1>
+      <p>Consulta indicadores generales del sistema y actividad reciente.</p>
+    </div>
 
-  <div class="shortcuts-grid">
-    <article class="shortcut-card" *ngFor="let item of shortcuts" [ngClass]="item.tone">
-      <div class="shortcut-top">
-        <lucide-icon [name]="item.icon"></lucide-icon>
-        <strong *ngIf="item.value !== null">{{ item.value }}</strong>
-      </div>
+    <div class="header-actions">
+      <a routerLink="/admin/citas" class="btn-primary-link">Ver citas</a>
+      <button type="button" class="btn-outline" (click)="loadDashboard()">Recargar</button>
+    </div>
+  </header>
 
-      <h3>{{ item.title }}</h3>
-      <p>{{ item.description }}</p>
-    </article>
-  </div>
+  <div *ngIf="loading()" class="state-box">Cargando dashboard...</div>
 
-  <div class="charts-grid">
-    <section class="chart-card">
-      <h2>Citas por Especialidad</h2>
-      <div class="chart-placeholder pie-placeholder">
-        <div class="fake-pie"></div>
-        <div class="legend">
-          <span>Medicina General 50%</span>
-          <span>Psicología 25%</span>
-          <span>Odontología 25%</span>
-        </div>
-      </div>
-    </section>
+  <ng-container *ngIf="!loading() && dashboard() as data">
+    <div class="stats-grid">
+      <article class="stat-card"><span>Total de citas</span><strong>{{ data.totals.total_citas }}</strong></article>
+      <article class="stat-card info"><span>Citas de hoy</span><strong>{{ data.totals.citas_hoy }}</strong></article>
+      <article class="stat-card warning"><span>Pendientes</span><strong>{{ data.totals.pendientes }}</strong></article>
+      <article class="stat-card success"><span>Confirmadas</span><strong>{{ data.totals.confirmadas }}</strong></article>
+      <article class="stat-card done"><span>Atendidas</span><strong>{{ data.totals.atendidas }}</strong></article>
+      <article class="stat-card danger"><span>Canceladas</span><strong>{{ data.totals.canceladas }}</strong></article>
+    </div>
 
-    <section class="chart-card">
-      <h2>Tendencia Semanal de Citas</h2>
-      <div class="chart-placeholder line-placeholder">
-        <div class="fake-line"></div>
-      </div>
-    </section>
-  </div>
+    <div class="catalog-grid">
+      <article class="mini-card">
+        <span>Médicos activos</span>
+        <strong>{{ data.catalog_stats.medicos_activos }}</strong>
+      </article>
 
-  <section class="section-block">
-    <h2>Resumen de Estados de Citas</h2>
+      <article class="mini-card">
+        <span>Consultorios activos</span>
+        <strong>{{ data.catalog_stats.consultorios_activos }}</strong>
+      </article>
 
-    <div class="summary-grid">
-      <article class="summary-card" *ngFor="let item of summary" [ngClass]="item.tone">
-        <span>{{ item.label }}</span>
-        <strong>{{ item.value }}</strong>
+      <article class="mini-card">
+        <span>Especialidades activas</span>
+        <strong>{{ data.catalog_stats.especialidades_activas }}</strong>
       </article>
     </div>
-  </section>
+
+    <section class="panel-card">
+      <div class="panel-header">
+        <h2>Actividad reciente</h2>
+        <p>Últimas citas registradas en el sistema.</p>
+      </div>
+
+      <div *ngIf="!data.recent_appointments.length" class="state-box empty">
+        No hay citas registradas todavía.
+      </div>
+
+      <div class="recent-list" *ngIf="data.recent_appointments.length">
+        <article class="recent-item" *ngFor="let item of data.recent_appointments">
+          <div>
+            <strong>{{ item.paciente_nombre }} {{ item.paciente_apellidos }}</strong>
+            <p>{{ item.fecha }} · {{ formatTime(item.hora_inicio) }} - {{ formatTime(item.hora_fin) }}</p>
+            <small>
+              {{ item.doctor_nombre }} {{ item.doctor_apellidos }} ·
+              {{ item.specialty_nombre }} ·
+              {{ item.consultorio_nombre }}
+            </small>
+          </div>
+
+          <app-appointment-status-chip [status]="toAppointmentStatus(item.estado)"></app-appointment-status-chip>
+        </article>
+      </div>
+    </section>
+  </ng-container>
 </section>

@@ -1,1 +1,236 @@
-<p>reportes works!</p>
+<section class="reports-page">
+  <div class="breadcrumb">
+    <span>Inicio</span>
+    <span class="separator">›</span>
+    <span class="current">Reportes</span>
+  </div>
+
+  <header class="page-header">
+    <div>
+      <h1>Reportes Estadísticos</h1>
+      <p>Análisis detallado del sistema de citas CliniTurn.</p>
+    </div>
+
+    <button type="button" class="btn-primary" (click)="loadData()">
+      Recargar datos
+    </button>
+  </header>
+
+  <div *ngIf="loading()" class="state-box">
+    Cargando reportes...
+  </div>
+
+  <ng-container *ngIf="!loading()">
+    <div class="summary-grid">
+      <article class="summary-card">
+        <span>Total de citas</span>
+        <strong>{{ totalAppointments() }}</strong>
+        <small>Todas las citas registradas</small>
+      </article>
+
+      <article class="summary-card success">
+        <span>Tasa de confirmación</span>
+        <strong>{{ confirmationRate() }}%</strong>
+        <small>Citas confirmadas y atendidas</small>
+      </article>
+
+      <article class="summary-card danger">
+        <span>Tasa de cancelación</span>
+        <strong>{{ cancellationRate() }}%</strong>
+        <small>Citas canceladas</small>
+      </article>
+
+      <article class="summary-card info">
+        <span>Citas completadas</span>
+        <strong>{{ totalCompleted() }}</strong>
+        <small>Consultas finalizadas</small>
+      </article>
+    </div>
+
+    <div class="content-grid">
+      <section class="panel-card">
+        <div class="panel-header">
+          <h2>Distribución por Especialidad</h2>
+          <p>Participación relativa de citas por especialidad.</p>
+        </div>
+
+        <ng-container *ngIf="specialtyDistribution().length > 0; else noSpecialtyData">
+          <div class="pie-layout">
+            <div
+              class="pie-chart"
+              [style.background]="getPieChartStyle()">
+            </div>
+
+            <div class="legend-list">
+              <article
+                class="legend-item"
+                *ngFor="let item of specialtyDistribution(); let i = index">
+                <div class="legend-left">
+                  <span class="dot" [ngClass]="'dot-' + i"></span>
+                  <strong>{{ item.name }}</strong>
+                </div>
+
+                <div class="legend-right">
+                  <span>{{ item.count }}</span>
+                  <small>{{ item.percentage }}%</small>
+                </div>
+              </article>
+            </div>
+          </div>
+        </ng-container>
+
+        <ng-template #noSpecialtyData>
+          <div class="state-box empty">
+            No hay datos suficientes para esta visualización.
+          </div>
+        </ng-template>
+      </section>
+
+      <section class="panel-card">
+        <div class="panel-header">
+          <h2>Tendencia de Citas por Semana</h2>
+          <p>Comportamiento de los últimos 7 días.</p>
+        </div>
+
+        <ng-container *ngIf="weeklyTrend().length > 0; else noWeeklyData">
+          <div class="bars-grid">
+            <article class="bar-item" *ngFor="let item of weeklyTrend()">
+              <div class="bar-value">{{ item.count }}</div>
+              <div class="bar-track">
+                <div
+                  class="bar-fill"
+                  [style.height.px]="getWeeklyBarHeight(item.count)">
+                </div>
+              </div>
+              <small>{{ item.label }}</small>
+            </article>
+          </div>
+        </ng-container>
+
+        <ng-template #noWeeklyData>
+          <div class="state-box empty">
+            No hay datos semanales disponibles.
+          </div>
+        </ng-template>
+      </section>
+
+      <section class="panel-card">
+        <div class="panel-header">
+          <h2>Citas por Mes</h2>
+          <p>Últimos 6 meses.</p>
+        </div>
+
+        <ng-container *ngIf="monthlyTrend().length > 0; else noMonthlyData">
+          <div class="bars-grid monthly">
+            <article class="bar-item" *ngFor="let item of monthlyTrend()">
+              <div class="bar-value">{{ item.count }}</div>
+              <div class="bar-track">
+                <div
+                  class="bar-fill monthly-fill"
+                  [style.height.px]="getMonthlyBarHeight(item.count)">
+                </div>
+              </div>
+              <small>{{ item.label }}</small>
+            </article>
+          </div>
+        </ng-container>
+
+        <ng-template #noMonthlyData>
+          <div class="state-box empty">
+            No hay datos mensuales disponibles.
+          </div>
+        </ng-template>
+      </section>
+
+      <section class="panel-card">
+        <div class="panel-header">
+          <h2>Citas por Estado</h2>
+          <p>Resumen visual por estatus.</p>
+        </div>
+
+        <ng-container *ngIf="statusSummary().length > 0; else noStatusData">
+          <div class="status-list">
+            <article
+              class="status-item"
+              *ngFor="let item of statusSummary()"
+              [ngClass]="item.cssClass">
+              <div>
+                <strong>{{ item.label }}</strong>
+                <p>{{ item.count }} citas</p>
+              </div>
+              <span>{{ item.percentage }}%</span>
+            </article>
+          </div>
+        </ng-container>
+
+        <ng-template #noStatusData>
+          <div class="state-box empty">
+            No hay datos de estados disponibles.
+          </div>
+        </ng-template>
+      </section>
+    </div>
+
+    <div class="bottom-grid">
+      <section class="panel-card">
+        <div class="panel-header">
+          <h2>Resumen Ejecutivo</h2>
+          <p>Panorama general del sistema.</p>
+        </div>
+
+        <div class="executive-list">
+          <article class="exec-row">
+            <span>Total de citas</span>
+            <strong>{{ totalAppointments() }}</strong>
+          </article>
+
+          <article class="exec-row">
+            <span>Citas activas</span>
+            <strong>{{ totalAppointments() - totalCancelled() }}</strong>
+          </article>
+
+          <article class="exec-row">
+            <span>Tasa de éxito</span>
+            <strong>{{ successRate() }}%</strong>
+          </article>
+
+          <article class="exec-row">
+            <span>Especialidad más solicitada</span>
+            <strong>{{ topSpecialty() }}</strong>
+          </article>
+
+          <article class="exec-row">
+            <span>Médicos activos</span>
+            <strong>{{ activeDoctors() }}</strong>
+          </article>
+
+          <article class="exec-row">
+            <span>Consultorios activos</span>
+            <strong>{{ activeConsultorios() }}</strong>
+          </article>
+        </div>
+      </section>
+
+      <section class="panel-card success-panel">
+        <div class="panel-header">
+          <h2>Recomendaciones</h2>
+          <p>Sugerencias automáticas basadas en la operación actual.</p>
+        </div>
+
+        <ng-container *ngIf="recommendations().length > 0; else noRecommendations">
+          <ul class="recommendation-list">
+            <li *ngFor="let item of recommendations()">
+              {{ item }}
+            </li>
+          </ul>
+        </ng-container>
+
+        <ng-template #noRecommendations>
+          <div class="state-box empty">
+            No hay recomendaciones disponibles por el momento.
+          </div>
+        </ng-template>
+      </section>
+    </div>
+  </ng-container>
+</section>

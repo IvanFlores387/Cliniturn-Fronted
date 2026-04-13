@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, DestroyRef, inject, signal } from '@angular/core';
+import { Component, DestroyRef, computed, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
 
@@ -29,7 +29,6 @@ export class MedicoMisCitasComponent {
   private readonly destroyRef = inject(DestroyRef);
 
   readonly appointments = signal<Appointment[]>([]);
-  readonly filteredAppointments = signal<Appointment[]>([]);
   readonly loading = signal(true);
   readonly processingId = signal<number | null>(null);
 
@@ -37,8 +36,60 @@ export class MedicoMisCitasComponent {
   readonly currentAction = signal<DoctorAction>(null);
   readonly showActionDialog = signal(false);
 
+  search = '';
   estadoFiltro = '';
   fechaFiltro = '';
+
+  readonly filteredAppointments = computed(() => {
+    let data = [...this.appointments()];
+
+    if (this.estadoFiltro) {
+      data = data.filter((item) => item.estado === this.estadoFiltro);
+    }
+
+    if (this.fechaFiltro) {
+      data = data.filter((item) => item.fecha === this.fechaFiltro);
+    }
+
+    if (this.search.trim()) {
+      const query = this.search.trim().toLowerCase();
+
+      data = data.filter((item) => {
+        const patient = `${item.paciente_nombre ?? ''} ${item.paciente_apellidos ?? ''}`.toLowerCase();
+        const specialty = `${item.specialty_nombre ?? ''}`.toLowerCase();
+        const consultorio = `${item.consultorio_nombre ?? ''}`.toLowerCase();
+        const motivo = `${item.motivo_consulta ?? ''}`.toLowerCase();
+
+        return (
+          patient.includes(query) ||
+          specialty.includes(query) ||
+          consultorio.includes(query) ||
+          motivo.includes(query)
+        );
+      });
+    }
+
+    return data.sort((a, b) => {
+      const dateA = new Date(`${a.fecha}T${a.hora_inicio}`).getTime();
+      const dateB = new Date(`${b.fecha}T${b.hora_inicio}`).getTime();
+      return dateA - dateB;
+    });
+  });
+
+  readonly totalCitas = computed(() => this.appointments().length);
+  readonly totalHoy = computed(() => {
+    const today = this.getTodayDate();
+    return this.appointments().filter((item) => item.fecha === today).length;
+  });
+  readonly totalPendientes = computed(
+    () => this.appointments().filter((item) => item.estado === 'pendiente').length
+  );
+  readonly totalConfirmadas = computed(
+    () => this.appointments().filter((item) => item.estado === 'confirmada').length
+  );
+  readonly totalAtendidas = computed(
+    () => this.appointments().filter((item) => item.estado === 'atendida').length
+  );
 
   constructor() {
     this.loadAppointments();
@@ -47,12 +98,12 @@ export class MedicoMisCitasComponent {
   loadAppointments(): void {
     this.loading.set(true);
 
-    this.appointmentsService.getDoctorAppointments()
+    this.appointmentsService
+      .getDoctorAppointments()
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: (data) => {
           this.appointments.set(data);
-          this.applyFilters();
           this.loading.set(false);
         },
         error: (err) => {
@@ -60,22 +111,14 @@ export class MedicoMisCitasComponent {
           this.notificationService.error(
             err?.error?.message || 'No se pudieron cargar las citas del médico.'
           );
-        }
+        },
       });
   }
 
-  applyFilters(): void {
-    let data = [...this.appointments()];
-
-    if (this.estadoFiltro) {
-      data = data.filter(item => item.estado === this.estadoFiltro);
-    }
-
-    if (this.fechaFiltro) {
-      data = data.filter(item => item.fecha === this.fechaFiltro);
-    }
-
-    this.filteredAppointments.set(data);
+  clearFilters(): void {
+    this.search = '';
+    this.estadoFiltro = '';
+    this.fechaFiltro = '';
   }
 
   canConfirm(item: Appointment): boolean {
@@ -87,7 +130,7 @@ export class MedicoMisCitasComponent {
   }
 
   canAttend(item: Appointment): boolean {
-    return item.estado === 'pendiente' || item.estado === 'confirmada';
+    return item.estado === 'confirmada';
   }
 
   openActionDialog(item: Appointment, action: DoctorAction): void {
@@ -111,7 +154,7 @@ export class MedicoMisCitasComponent {
       case 'cancel':
         return 'Cancelar cita';
       case 'attended':
-        return 'Marcar cita como atendida';
+        return 'Marcar como atendida';
       default:
         return 'Confirmar acción';
     }
@@ -192,7 +235,7 @@ export class MedicoMisCitasComponent {
               ? 'La cita fue confirmada correctamente.'
               : action === 'cancel'
                 ? 'La cita fue cancelada correctamente.'
-                : 'La cita fue marcada como atendida.';
+                : 'La cita fue marcada como atendida correctamente.';
 
           this.processingId.set(null);
           this.closeActionDialog();
@@ -205,8 +248,19 @@ export class MedicoMisCitasComponent {
           this.notificationService.error(
             err?.error?.message || 'No se pudo actualizar la cita.'
           );
-        }
+        },
       });
+  }
+
+  formatTime(value: string): string {
+    return value?.slice(0, 5) || value;
+  }
+
+  private getTodayDate(): string {
+    const date = new Date();
+    const offset = date.getTimezoneOffset();
+    const localDate = new Date(date.getTime() - offset * 60000);
+    return localDate.toISOString().split('T')[0];
   }
 
   trackByAppointmentId(_: number, item: Appointment): number {
