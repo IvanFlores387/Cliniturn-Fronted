@@ -16,4 +16,6 @@ export interface User {
   especialidad?: string;
 
   codigoAdmin?: string;
+
+  doctor_id?: number | null;
 }

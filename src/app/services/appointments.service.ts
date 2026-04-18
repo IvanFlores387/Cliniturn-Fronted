@@ -1,6 +1,6 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
-import { Observable, map } from 'rxjs';
+import { Observable, map, catchError, of, throwError } from 'rxjs';
 import { environment } from '../../environments/environment';
 import { Appointment } from '../core/models/appointment.model';
 import { PaginatedResponse } from '../core/models/paginated-response.model';
@@ -41,7 +41,16 @@ export class AppointmentsService {
 
   getDoctorAppointments(): Observable<Appointment[]> {
     return this.http.get<{ ok: boolean; data: Appointment[] }>(`${this.apiUrl}/doctor`).pipe(
-      map(res => res.data)
+      map(res => res.data),
+      catchError((error) => {
+        const message = String(error?.error?.message ?? '').toLowerCase();
+
+        if (message.includes('doctor_id asociado')) {
+          return of([]);
+        }
+
+        return throwError(() => error);
+      })
     );
   }
 

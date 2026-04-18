@@ -1,6 +1,6 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable, map } from 'rxjs';
+import { Observable, map, catchError, of, throwError } from 'rxjs';
 import { environment } from '../../environments/environment';
 import {
   PatientDashboardData,
@@ -22,7 +22,29 @@ export class DashboardService {
   getDoctorDashboard(): Observable<DoctorDashboardData> {
     return this.http
       .get<{ ok: boolean; data: DoctorDashboardData }>(`${this.apiUrl}/doctor`)
-      .pipe(map((res) => res.data));
+      .pipe(
+        map((res) => res.data),
+        catchError((error) => {
+          const message = String(error?.error?.message ?? '').toLowerCase();
+
+          if (message.includes('doctor_id asociado')) {
+            return of({
+              totals: {
+                total_citas: 0,
+                citas_hoy: 0,
+                pendientes: 0,
+                confirmadas: 0,
+                atendidas: 0,
+                canceladas: 0,
+              },
+              today_appointments: [],
+              upcoming_appointments: [],
+            } as DoctorDashboardData);
+          }
+
+          return throwError(() => error);
+        })
+      );
   }
 
   getAdminDashboard(): Observable<AdminDashboardData> {

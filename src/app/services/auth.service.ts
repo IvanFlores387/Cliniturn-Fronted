@@ -1,6 +1,6 @@
 import { Injectable, computed, signal } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable, tap, map } from 'rxjs';
+import { Observable, tap, map, of, catchError } from 'rxjs';
 import { Router } from '@angular/router';
 
 import { environment } from '../../environments/environment';
@@ -42,7 +42,7 @@ export class AuthService {
 
   readonly token = computed(() => this.tokenSignal());
   readonly user = computed(() => this.userSignal());
-  readonly isAuthenticated = computed(() => !!this.tokenSignal() && !!this.userSignal());
+  readonly isAuthenticated = computed(() => !!this.tokenSignal());
   readonly role = computed(() => this.userSignal()?.role ?? null);
 
   constructor(
@@ -57,7 +57,6 @@ export class AuthService {
     );
   }
 
-  // 🔥 MÉTODO MODIFICADO (NO guarda sesión automáticamente)
   register(payload: RegisterPayload): Observable<User> {
     return this.http.post<AuthResponse>(`${this.apiUrl}/register`, payload).pipe(
       map((response) => response.data.user)
@@ -71,6 +70,33 @@ export class AuthService {
         localStorage.setItem('user', JSON.stringify(response.data));
       }),
       map((response) => response.data)
+    );
+  }
+
+  ensureProfileLoaded(force = false): Observable<User | null> {
+    const token = this.tokenSignal();
+
+    if (!token) {
+      return of(null);
+    }
+
+    const currentUser = this.userSignal();
+
+    const mustRefresh =
+      force ||
+      !currentUser ||
+      !currentUser.nombre ||
+      (currentUser.role === 'medico' && currentUser.doctor_id === undefined);
+
+    if (!mustRefresh) {
+      return of(currentUser);
+    }
+
+    return this.getProfile().pipe(
+      catchError((error) => {
+        console.error('No se pudo refrescar el perfil del usuario.', error);
+        return of(this.userSignal());
+      })
     );
   }
 

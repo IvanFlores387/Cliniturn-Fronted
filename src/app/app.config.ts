@@ -40,7 +40,10 @@ import {
   BadgePlus,
   Activity,
   CalendarDays,
-  NotebookPen
+  NotebookPen,
+  CalendarPlus,
+  BarChart3,
+  Clock3
 } from 'lucide-angular';
 
 export const appConfig: ApplicationConfig = {
@@ -80,7 +83,10 @@ export const appConfig: ApplicationConfig = {
         BadgePlus,
         Activity,
         CalendarDays,
-        NotebookPen
+        NotebookPen,
+        CalendarPlus,
+        BarChart3,
+        Clock3
       })
     )
   ]

@@ -1,10 +1,11 @@
 import { Component, computed, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterModule } from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
 import { LucideAngularModule } from 'lucide-angular';
 
 import { AuthService } from '../../../services/auth.service';
 import { MenuItem } from '../../../core/models/menu-item.model';
+import { UserRole } from '../../../core/models/user.model';
 
 @Component({
   selector: 'app-sidebar',
@@ -15,9 +16,13 @@ import { MenuItem } from '../../../core/models/menu-item.model';
 })
 export class SidebarComponent {
   private readonly authService = inject(AuthService);
+  private readonly router = inject(Router);
 
-  readonly currentUser = computed(() => this.authService.getCurrentUser());
-  readonly currentRole = computed(() => this.authService.getRole());
+  readonly currentUser = computed(() => this.authService.user());
+
+  readonly currentRole = computed<UserRole | null>(() => {
+    return this.authService.getRole() ?? this.resolveRoleFromUrl();
+  });
 
   readonly menu = computed<MenuItem[]>(() => {
     const role = this.currentRole();
@@ -54,8 +59,16 @@ export class SidebarComponent {
 
   get userName(): string {
     const user = this.currentUser();
-    if (!user) return 'Usuario';
-    return `${user.nombre}${user.apellidos ? ' ' + user.apellidos : ''}`;
+
+    if (user?.nombre?.trim()) {
+      return `${user.nombre}${user.apellidos ? ' ' + user.apellidos : ''}`;
+    }
+
+    if (this.currentRole() === 'paciente') return 'Paciente';
+    if (this.currentRole() === 'medico') return 'Médico';
+    if (this.currentRole() === 'admin') return 'Administrador';
+
+    return 'Usuario';
   }
 
   get userRoleLabel(): string {
@@ -68,6 +81,7 @@ export class SidebarComponent {
 
   get extraInfo(): string {
     const user = this.currentUser();
+
     if (!user) return '';
 
     if (user.role === 'paciente') {
@@ -79,5 +93,15 @@ export class SidebarComponent {
     }
 
     return user.email ?? '';
+  }
+
+  private resolveRoleFromUrl(): UserRole | null {
+    const url = this.router.url || '';
+
+    if (url.startsWith('/paciente')) return 'paciente';
+    if (url.startsWith('/medico')) return 'medico';
+    if (url.startsWith('/admin')) return 'admin';
+
+    return null;
   }
 }

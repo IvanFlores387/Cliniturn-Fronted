@@ -46,8 +46,16 @@ export class LoginComponent implements OnInit {
 
     this.authService.login(payload).subscribe({
       next: (user) => {
-        this.isSubmitting.set(false);
-        this.authService.redirectByRole(user.role);
+        this.authService.ensureProfileLoaded(true).subscribe({
+          next: () => {
+            this.isSubmitting.set(false);
+            this.authService.redirectByRole(user.role);
+          },
+          error: () => {
+            this.isSubmitting.set(false);
+            this.authService.redirectByRole(user.role);
+          }
+        });
       },
       error: (error) => {
         this.isSubmitting.set(false);
