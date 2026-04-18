@@ -1,5 +1,6 @@
 .sidebar {
   width: 250px;
+  min-width: 250px;
   min-height: calc(100vh - 72px);
   background: #ffffff;
   border-right: 1px solid #e5e7eb;
@@ -9,6 +10,7 @@
   padding: 1rem 0.75rem;
   position: sticky;
   top: 72px;
+  overflow-x: hidden;
 }
 
 .menu {
@@ -26,6 +28,7 @@
   text-decoration: none;
   color: #334155;
   transition: background 0.2s ease, color 0.2s ease, transform 0.2s ease;
+  white-space: nowrap;
 
   &:hover {
     background: #eff6ff;
@@ -37,6 +40,11 @@
     background: #eaf2ff;
     color: #1d4ed8;
     font-weight: 700;
+  }
+
+  span {
+    display: inline;
+    white-space: nowrap;
   }
 }
 
@@ -65,23 +73,30 @@
   }
 }
 
+/* TABLET Y LAPTOP PEQUEÑA:
+   sigue visible completo, solo un poco más compacto */
 @media (max-width: 1100px) {
   .sidebar {
-    width: 88px;
-    padding: 1rem 0.55rem;
+    width: 230px;
+    min-width: 230px;
+    padding: 1rem 0.65rem;
   }
 
   .menu-item {
-    justify-content: center;
-    padding: 0.95rem 0.5rem;
+    justify-content: flex-start;
+    padding: 0.9rem 0.85rem;
   }
 
-  .menu-item span,
+  .menu-item span {
+    display: inline;
+  }
+
   .sidebar-footer {
-    display: none;
+    display: flex;
   }
 }
 
+/* SOLO EN MÓVIL REAL se oculta */
 @media (max-width: 768px) {
   .sidebar {
     display: none;
