@@ -10,7 +10,6 @@
   padding: 1rem 0.75rem;
   position: sticky;
   top: 72px;
-  overflow-x: hidden;
 }
 
 .menu {
@@ -73,8 +72,6 @@
   }
 }
 
-/* TABLET Y LAPTOP PEQUEÑA:
-   sigue visible completo, solo un poco más compacto */
 @media (max-width: 1100px) {
   .sidebar {
     width: 230px;
@@ -84,7 +81,7 @@
 
   .menu-item {
     justify-content: flex-start;
-    padding: 0.9rem 0.85rem;
+    padding: 0.95rem 0.85rem;
   }
 
   .menu-item span {
@@ -96,7 +93,6 @@
   }
 }
 
-/* SOLO EN MÓVIL REAL se oculta */
 @media (max-width: 768px) {
   .sidebar {
     display: none;

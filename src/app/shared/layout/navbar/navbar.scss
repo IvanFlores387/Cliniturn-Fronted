@@ -64,7 +64,6 @@
   }
 }
 
-/* En tablet todavía mostramos el usuario */
 @media (max-width: 768px) {
   .navbar {
     padding: 0 1rem;
@@ -79,7 +78,6 @@
   }
 }
 
-/* Solo en móvil pequeño ocultamos el bloque del usuario */
 @media (max-width: 560px) {
   .navbar__user {
     display: none;

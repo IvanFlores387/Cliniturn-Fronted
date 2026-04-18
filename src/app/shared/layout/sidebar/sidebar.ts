@@ -2,7 +2,7 @@ import { Component, DestroyRef, computed, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { NavigationEnd, Router, RouterModule } from '@angular/router';
 import { LucideAngularModule } from 'lucide-angular';
-import { filter, startWith } from 'rxjs';
+import { filter } from 'rxjs';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 import { AuthService } from '../../../services/auth.service';
@@ -21,66 +21,65 @@ export class SidebarComponent {
   private readonly router = inject(Router);
   private readonly destroyRef = inject(DestroyRef);
 
-  private readonly currentUrl = signal(this.router.url);
+  private readonly currentPath = signal(this.getCurrentPath());
 
   constructor() {
+    this.syncCurrentPath();
+
     this.router.events
       .pipe(
         filter((event): event is NavigationEnd => event instanceof NavigationEnd),
-        startWith(null),
         takeUntilDestroyed(this.destroyRef)
       )
       .subscribe(() => {
-        this.currentUrl.set(this.router.url);
+        this.syncCurrentPath();
       });
   }
 
   readonly currentUser = computed(() => this.authService.user());
 
   readonly currentRole = computed<UserRole | null>(() => {
-    const authRole = this.authService.role();
-    if (authRole) return authRole;
+    const userRole = this.currentUser()?.role;
+    if (userRole) return userRole;
 
-    const url = this.currentUrl();
+    const path = this.currentPath();
 
-    if (url.startsWith('/paciente')) return 'paciente';
-    if (url.startsWith('/medico')) return 'medico';
-    if (url.startsWith('/admin')) return 'admin';
+    if (path.startsWith('/paciente')) return 'paciente';
+    if (path.startsWith('/medico')) return 'medico';
+    if (path.startsWith('/admin')) return 'admin';
 
     return null;
   });
 
   readonly menu = computed<MenuItem[]>(() => {
-    const role = this.currentRole();
+    switch (this.currentRole()) {
+      case 'paciente':
+        return [
+          { label: 'Dashboard', route: '/paciente/dashboard', icon: 'layout-dashboard' },
+          { label: 'Nueva Cita', route: '/paciente/nueva-cita', icon: 'calendar-plus' },
+          { label: 'Mis Citas', route: '/paciente/mis-citas', icon: 'calendar-days' },
+        ];
 
-    if (role === 'paciente') {
-      return [
-        { label: 'Dashboard', route: '/paciente/dashboard', icon: 'layout-dashboard' },
-        { label: 'Nueva Cita', route: '/paciente/nueva-cita', icon: 'calendar-plus' },
-        { label: 'Mis Citas', route: '/paciente/mis-citas', icon: 'calendar-days' },
-      ];
+      case 'medico':
+        return [
+          { label: 'Dashboard', route: '/medico/dashboard', icon: 'layout-dashboard' },
+          { label: 'Mis Citas', route: '/medico/mis-citas', icon: 'calendar-days' },
+          { label: 'Expedientes', route: '/medico/expedientes', icon: 'file-text' },
+        ];
+
+      case 'admin':
+        return [
+          { label: 'Dashboard', route: '/admin/dashboard', icon: 'layout-dashboard' },
+          { label: 'Citas', route: '/admin/citas', icon: 'calendar-days' },
+          { label: 'Médicos', route: '/admin/gestion-medicos', icon: 'stethoscope' },
+          { label: 'Consultorios', route: '/admin/gestion-consultorios', icon: 'building-2' },
+          { label: 'Reportes', route: '/admin/reportes', icon: 'bar-chart-3' },
+          { label: 'Horarios Médicos', route: '/admin/horarios-medicos', icon: 'clock-3' },
+        ];
+
+      default:
+        return [];
     }
-
-    if (role === 'medico') {
-      return [
-        { label: 'Dashboard', route: '/medico/dashboard', icon: 'layout-dashboard' },
-        { label: 'Mis Citas', route: '/medico/mis-citas', icon: 'calendar-days' },
-        { label: 'Expedientes', route: '/medico/expedientes', icon: 'file-text' },
-      ];
-    }
-
-    if (role === 'admin') {
-      return [
-        { label: 'Dashboard', route: '/admin/dashboard', icon: 'layout-dashboard' },
-        { label: 'Citas', route: '/admin/citas', icon: 'calendar-days' },
-        { label: 'Médicos', route: '/admin/gestion-medicos', icon: 'stethoscope' },
-        { label: 'Consultorios', route: '/admin/gestion-consultorios', icon: 'building-2' },
-        { label: 'Reportes', route: '/admin/reportes', icon: 'bar-chart-3' },
-        { label: 'Horarios Médicos', route: '/admin/horarios-medicos', icon: 'clock-3' },
-      ];
-    }
-
-    return [];
   });
 
   get userName(): string {
@@ -119,5 +118,17 @@ export class SidebarComponent {
     }
 
     return user.email ?? '';
+  }
+
+  private syncCurrentPath(): void {
+    this.currentPath.set(this.getCurrentPath());
+  }
+
+  private getCurrentPath(): string {
+    if (typeof window !== 'undefined' && window.location?.pathname) {
+      return window.location.pathname;
+    }
+
+    return this.router.url || '';
   }
 }
