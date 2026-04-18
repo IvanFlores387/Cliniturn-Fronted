@@ -1,7 +1,9 @@
-import { Component, computed, inject } from '@angular/core';
+import { Component, DestroyRef, computed, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Router, RouterModule } from '@angular/router';
+import { NavigationEnd, Router, RouterModule } from '@angular/router';
 import { LucideAngularModule } from 'lucide-angular';
+import { filter, startWith } from 'rxjs';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 import { AuthService } from '../../../services/auth.service';
 import { MenuItem } from '../../../core/models/menu-item.model';
@@ -17,11 +19,35 @@ import { UserRole } from '../../../core/models/user.model';
 export class SidebarComponent {
   private readonly authService = inject(AuthService);
   private readonly router = inject(Router);
+  private readonly destroyRef = inject(DestroyRef);
+
+  private readonly currentUrl = signal(this.router.url);
+
+  constructor() {
+    this.router.events
+      .pipe(
+        filter((event): event is NavigationEnd => event instanceof NavigationEnd),
+        startWith(null),
+        takeUntilDestroyed(this.destroyRef)
+      )
+      .subscribe(() => {
+        this.currentUrl.set(this.router.url);
+      });
+  }
 
   readonly currentUser = computed(() => this.authService.user());
 
   readonly currentRole = computed<UserRole | null>(() => {
-    return this.authService.getRole() ?? this.resolveRoleFromUrl();
+    const authRole = this.authService.role();
+    if (authRole) return authRole;
+
+    const url = this.currentUrl();
+
+    if (url.startsWith('/paciente')) return 'paciente';
+    if (url.startsWith('/medico')) return 'medico';
+    if (url.startsWith('/admin')) return 'admin';
+
+    return null;
   });
 
   readonly menu = computed<MenuItem[]>(() => {
@@ -93,15 +119,5 @@ export class SidebarComponent {
     }
 
     return user.email ?? '';
-  }
-
-  private resolveRoleFromUrl(): UserRole | null {
-    const url = this.router.url || '';
-
-    if (url.startsWith('/paciente')) return 'paciente';
-    if (url.startsWith('/medico')) return 'medico';
-    if (url.startsWith('/admin')) return 'admin';
-
-    return null;
   }
 }

@@ -1,6 +1,6 @@
 import { Injectable, computed, signal } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable, tap, map, of, catchError } from 'rxjs';
+import { Observable, tap, map, catchError, of } from 'rxjs';
 import { Router } from '@angular/router';
 
 import { environment } from '../../environments/environment';
@@ -37,7 +37,7 @@ interface RegisterPayload {
 export class AuthService {
   private readonly apiUrl = `${environment.apiUrl}/api/auth`;
 
-  private readonly tokenSignal = signal<string | null>(localStorage.getItem('token'));
+  private readonly tokenSignal = signal<string | null>(this.getStoredToken());
   private readonly userSignal = signal<User | null>(this.getStoredUser());
 
   readonly token = computed(() => this.tokenSignal());
@@ -75,26 +75,25 @@ export class AuthService {
 
   ensureProfileLoaded(force = false): Observable<User | null> {
     const token = this.tokenSignal();
-
     if (!token) {
       return of(null);
     }
 
     const currentUser = this.userSignal();
 
-    const mustRefresh =
+    const shouldLoad =
       force ||
       !currentUser ||
       !currentUser.nombre ||
       (currentUser.role === 'medico' && currentUser.doctor_id === undefined);
 
-    if (!mustRefresh) {
+    if (!shouldLoad) {
       return of(currentUser);
     }
 
     return this.getProfile().pipe(
       catchError((error) => {
-        console.error('No se pudo refrescar el perfil del usuario.', error);
+        console.error('No se pudo cargar el perfil.', error);
         return of(this.userSignal());
       })
     );
@@ -149,11 +148,18 @@ export class AuthService {
     }
   }
 
-  private getStoredUser(): User | null {
-    const rawUser = localStorage.getItem('user');
-    if (!rawUser) return null;
-
+  private getStoredToken(): string | null {
     try {
+      return localStorage.getItem('token');
+    } catch {
+      return null;
+    }
+  }
+
+  private getStoredUser(): User | null {
+    try {
+      const rawUser = localStorage.getItem('user');
+      if (!rawUser) return null;
       return JSON.parse(rawUser) as User;
     } catch {
       return null;
