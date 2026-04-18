@@ -50,7 +50,7 @@ export class NavbarComponent {
   logout(): void {
     this.authService.logout();
   }
-
+//comentariooooo
   get userName(): string {
     const user = this.authService.getCurrentUser();
 
