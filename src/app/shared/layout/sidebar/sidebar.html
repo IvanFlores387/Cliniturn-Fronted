@@ -2,12 +2,17 @@
   <nav class="menu">
     <a
       *ngFor="let item of menu()"
+      class="menu-item"
       [routerLink]="item.route"
       routerLinkActive="active"
-      [routerLinkActiveOptions]="{ exact: true }"
-      class="menu-item"
+      [routerLinkActiveOptions]="{ exact: false }"
     >
-      <lucide-icon [name]="item.icon" class="icon"></lucide-icon>
+      <lucide-icon
+        *ngIf="item.icon"
+        class="icon"
+        [name]="item.icon">
+      </lucide-icon>
+
       <span>{{ item.label }}</span>
     </a>
   </nav>

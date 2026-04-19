@@ -10,6 +10,7 @@
   padding: 1rem 0.75rem;
   position: sticky;
   top: 72px;
+  overflow-x: hidden;
 }
 
 .menu {
@@ -86,6 +87,7 @@
 
   .menu-item span {
     display: inline;
+    white-space: nowrap;
   }
 
   .sidebar-footer {
