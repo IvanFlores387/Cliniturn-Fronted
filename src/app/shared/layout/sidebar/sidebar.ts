@@ -58,6 +58,7 @@ export class SidebarComponent {
           { label: 'Dashboard', route: '/paciente/dashboard', icon: 'layout-dashboard' },
           { label: 'Nueva Cita', route: '/paciente/nueva-cita', icon: 'calendar-plus' },
           { label: 'Mis Citas', route: '/paciente/mis-citas', icon: 'calendar-days' },
+          { label: 'Mi Historial', route: '/paciente/expediente', icon: 'file-text' },
         ];
 
       case 'medico':
@@ -75,6 +76,7 @@ export class SidebarComponent {
           { label: 'Consultorios', route: '/admin/gestion-consultorios', icon: 'building-2' },
           { label: 'Reportes', route: '/admin/reportes', icon: 'bar-chart-3' },
           { label: 'Horarios Médicos', route: '/admin/horarios-medicos', icon: 'clock-3' },
+          { label: 'Expedientes', route: '/admin/expedientes', icon: 'file-text' },
         ];
 
       default:

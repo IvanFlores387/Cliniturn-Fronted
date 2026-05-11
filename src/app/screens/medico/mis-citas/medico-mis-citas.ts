@@ -2,6 +2,7 @@ import { CommonModule } from '@angular/common';
 import { Component, DestroyRef, computed, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
+import { RouterModule } from '@angular/router';
 
 import { Appointment } from '../../../core/models/appointment.model';
 import { AppointmentsService } from '../../../services/appointments.service';
@@ -17,6 +18,7 @@ type DoctorAction = 'confirm' | 'cancel' | 'attended' | null;
   imports: [
     CommonModule,
     FormsModule,
+    RouterModule,
     AppointmentStatusChipComponent,
     ConfirmDialogComponent,
   ],

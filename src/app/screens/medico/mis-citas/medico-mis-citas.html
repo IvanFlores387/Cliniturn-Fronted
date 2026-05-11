@@ -145,6 +145,14 @@
           {{ processingId() === item.id ? 'Procesando...' : 'Confirmar' }}
         </button>
 
+        <a
+          class="btn-action btn-success"
+          *ngIf="item.estado === 'confirmada'"
+          [routerLink]="['/medico/registro-consulta', item.id]"
+        >
+          Registrar consulta
+        </a>
+
         <button
           type="button"
           class="btn-action btn-success"

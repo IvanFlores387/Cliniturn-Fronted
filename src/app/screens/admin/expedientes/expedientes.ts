@@ -8,258 +8,176 @@ import {
   signal,
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { RouterModule } from '@angular/router';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
-import { Appointment } from '../../../core/models/appointment.model';
-import { AppointmentsService } from '../../../services/appointments.service';
+import { MedicalRecord } from '../../../core/models/clinical-record.model';
+import { RecordsService } from '../../../services/records.service';
 import { NotificationService } from '../../../services/notification.service';
-import { AppointmentStatusChipComponent } from '../../../shared/components/appointment-status-chip/appointment-status-chip';
-
-interface AdminPatientRecord {
-  patientKey: string;
-  patientId: number | null;
-  patientName: string;
-  totalAppointments: number;
-  pendingAppointments: number;
-  confirmedAppointments: number;
-  attendedAppointments: number;
-  cancelledAppointments: number;
-  doctors: string[];
-  specialties: string[];
-  appointments: Appointment[];
-  lastAppointment: Appointment | null;
-  nextAppointment: Appointment | null;
-}
 
 @Component({
   selector: 'app-expedientes-admin',
   standalone: true,
-  imports: [CommonModule, FormsModule, AppointmentStatusChipComponent],
+  imports: [CommonModule, FormsModule, RouterModule],
   templateUrl: './expedientes.html',
   styleUrl: './expedientes.scss',
 })
 export class ExpedientesAdminComponent {
-  private readonly appointmentsService = inject(AppointmentsService);
+  private readonly recordsService = inject(RecordsService);
   private readonly notificationService = inject(NotificationService);
   private readonly destroyRef = inject(DestroyRef);
 
   readonly loading = signal<boolean>(true);
-  readonly appointments = signal<Appointment[]>([]);
-  readonly selectedPatientKey = signal<string | null>(null);
+  readonly records = signal<MedicalRecord[]>([]);
+  readonly selectedRecordId = signal<number | null>(null);
 
   search = '';
-  estadoFiltro = '';
-  especialidadFiltro = '';
+  fecha_inicio = '';
+  fecha_fin = '';
 
-  readonly records = computed<AdminPatientRecord[]>(() => {
-    const appointments = this.appointments();
-    const now = new Date();
-    const grouped = new Map<string, Appointment[]>();
+  readonly filteredRecords = computed<MedicalRecord[]>(() => {
+    const query = this.search.trim().toLowerCase();
 
-    for (const appointment of appointments) {
-      const patientId = appointment.paciente_id ?? null;
-      const patientName = this.buildPatientName(appointment);
-
-      const key =
-        patientId !== null
-          ? String(patientId)
-          : patientName || `sin-paciente-${appointment.id}`;
-
-      if (!grouped.has(key)) {
-        grouped.set(key, []);
-      }
-
-      grouped.get(key)!.push(appointment);
+    if (!query) {
+      return this.records();
     }
 
-    let data = Array.from(grouped.entries()).map(([key, items]) => {
-      const orderedDesc = [...items].sort(
-        (a, b) => this.getAppointmentTime(b) - this.getAppointmentTime(a)
+    return this.records().filter((record) => {
+      const patientName = this.patientName(record).toLowerCase();
+      const matricula = String(record.paciente_matricula ?? '').toLowerCase();
+      const pacienteId = String(record.paciente_id ?? '').toLowerCase();
+
+      const doctorName = `${record.last_doctor_nombre ?? ''} ${record.last_doctor_apellidos ?? ''}`
+        .trim()
+        .toLowerCase();
+
+      const diagnosis = String(record.last_diagnosis ?? '').toLowerCase();
+      const treatment = String(record.last_treatment ?? '').toLowerCase();
+
+      return (
+        patientName.includes(query) ||
+        matricula.includes(query) ||
+        pacienteId.includes(query) ||
+        doctorName.includes(query) ||
+        diagnosis.includes(query) ||
+        treatment.includes(query)
       );
-
-      const orderedAsc = [...items].sort(
-        (a, b) => this.getAppointmentTime(a) - this.getAppointmentTime(b)
-      );
-
-      const nextAppointment =
-        orderedAsc.find((item) => {
-          const time = this.getAppointmentTime(item);
-          return (
-            time >= now.getTime() &&
-            ['pendiente', 'confirmada'].includes(item.estado)
-          );
-        }) ?? null;
-
-      const firstItem = orderedDesc[0] ?? null;
-
-      return {
-        patientKey: key,
-        patientId: firstItem?.paciente_id ?? null,
-        patientName: this.buildPatientName(firstItem),
-        totalAppointments: items.length,
-        pendingAppointments: items.filter((item) => item.estado === 'pendiente').length,
-        confirmedAppointments: items.filter((item) => item.estado === 'confirmada').length,
-        attendedAppointments: items.filter((item) => item.estado === 'atendida').length,
-        cancelledAppointments: items.filter((item) => item.estado === 'cancelada').length,
-        doctors: Array.from(
-          new Set(
-            items
-              .map((item) => this.buildDoctorName(item))
-              .filter((value): value is string => Boolean(value))
-          )
-        ).sort((a, b) => a.localeCompare(b)),
-        specialties: Array.from(
-          new Set(
-            items
-              .map((item) => item.specialty_nombre?.trim())
-              .filter((value): value is string => Boolean(value))
-          )
-        ).sort((a, b) => a.localeCompare(b)),
-        appointments: orderedDesc,
-        lastAppointment: firstItem,
-        nextAppointment,
-      };
     });
-
-    if (this.estadoFiltro) {
-      data = data.filter((record) =>
-        record.appointments.some((item) => item.estado === this.estadoFiltro)
-      );
-    }
-
-    if (this.especialidadFiltro) {
-      data = data.filter((record) =>
-        record.specialties.includes(this.especialidadFiltro)
-      );
-    }
-
-    if (this.search.trim()) {
-      const query = this.search.trim().toLowerCase();
-
-      data = data.filter((record) => {
-        const patientName = record.patientName.toLowerCase();
-        const doctors = record.doctors.join(' ').toLowerCase();
-        const specialties = record.specialties.join(' ').toLowerCase();
-
-        return (
-          patientName.includes(query) ||
-          doctors.includes(query) ||
-          specialties.includes(query)
-        );
-      });
-    }
-
-    return data.sort((a, b) => a.patientName.localeCompare(b.patientName));
   });
 
-  readonly selectedRecord = computed<AdminPatientRecord | null>(() => {
-    const currentKey = this.selectedPatientKey();
-    if (!currentKey) return null;
+  readonly selectedRecord = computed<MedicalRecord | null>(() => {
+    const id = this.selectedRecordId();
 
-    return this.records().find((item) => item.patientKey === currentKey) ?? null;
+    if (id === null) {
+      return null;
+    }
+
+    return this.records().find((record) => record.id === id) ?? null;
   });
-
-  readonly specialtyOptions = computed<string[]>(() =>
-    Array.from(
-      new Set(
-        this.appointments()
-          .map((item) => item.specialty_nombre?.trim())
-          .filter((value): value is string => Boolean(value))
-      )
-    ).sort((a, b) => a.localeCompare(b))
-  );
 
   readonly totalPacientes = computed<number>(() => this.records().length);
 
-  readonly totalAtendidos = computed<number>(() =>
-    this.records().filter((item) => item.attendedAppointments > 0).length
-  );
-
-  readonly totalPendientes = computed<number>(() =>
-    this.records().filter((item) => item.pendingAppointments > 0).length
+  readonly totalConsultas = computed<number>(() =>
+    this.records().reduce(
+      (sum, record) => sum + Number(record.total_consultations ?? 0),
+      0
+    )
   );
 
   constructor() {
     effect(() => {
-      const records = this.records();
-      const selectedKey = this.selectedPatientKey();
+      const records = this.filteredRecords();
+      const selectedId = this.selectedRecordId();
 
       if (!records.length) {
-        if (selectedKey !== null) {
-          this.selectedPatientKey.set(null);
+        if (selectedId !== null) {
+          this.selectedRecordId.set(null);
         }
+
         return;
       }
 
-      const exists = selectedKey
-        ? records.some((item) => item.patientKey === selectedKey)
+      const exists = selectedId
+        ? records.some((record) => record.id === selectedId)
         : false;
 
       if (!exists) {
-        this.selectedPatientKey.set(records[0].patientKey);
+        this.selectedRecordId.set(records[0].id);
       }
     });
 
-    this.loadAppointments();
+    this.loadRecords();
   }
 
-  loadAppointments(): void {
+  loadRecords(): void {
     this.loading.set(true);
 
-    this.appointmentsService
-      .getAll({})
+    this.recordsService
+      .getAll({
+        search: this.search,
+        fecha_inicio: this.fecha_inicio,
+        fecha_fin: this.fecha_fin,
+      })
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: (data) => {
-          this.appointments.set(Array.isArray(data) ? data : []);
+          this.records.set(Array.isArray(data) ? data : []);
           this.loading.set(false);
         },
-        error: (err) => {
+        error: (error) => {
+          this.records.set([]);
+          this.selectedRecordId.set(null);
           this.loading.set(false);
+
           this.notificationService.error(
-            err?.error?.message || 'No se pudieron cargar los expedientes.'
+            error?.error?.message || 'No se pudieron cargar los expedientes.'
           );
         },
       });
   }
 
+  selectRecord(record: MedicalRecord): void {
+    this.selectedRecordId.set(record.id);
+  }
+
   clearFilters(): void {
     this.search = '';
-    this.estadoFiltro = '';
-    this.especialidadFiltro = '';
+    this.fecha_inicio = '';
+    this.fecha_fin = '';
+    this.loadRecords();
   }
 
-  selectRecord(record: AdminPatientRecord): void {
-    this.selectedPatientKey.set(record.patientKey);
+  patientName(record: MedicalRecord | null | undefined): string {
+    if (!record) {
+      return 'Paciente sin nombre';
+    }
+
+    return `${record.paciente_nombre ?? ''} ${record.paciente_apellidos ?? ''}`.trim()
+      || 'Paciente sin nombre';
   }
 
-  formatTime(value: string | null | undefined): string {
-    if (!value) return 'Sin hora';
-    return value.slice(0, 5);
+  doctorName(record: MedicalRecord | null | undefined): string {
+    if (!record) {
+      return 'Sin médico';
+    }
+
+    return `${record.last_doctor_nombre ?? ''} ${record.last_doctor_apellidos ?? ''}`.trim()
+      || 'Sin médico';
   }
 
-  trackByRecord(_: number, item: AdminPatientRecord): string {
-    return item.patientKey;
+  formatDate(value: string | null | undefined): string {
+    if (!value) {
+      return 'Sin registro';
+    }
+
+    return new Date(value).toLocaleDateString('es-MX', {
+      year: 'numeric',
+      month: 'short',
+      day: '2-digit',
+    });
   }
 
-  trackByAppointment(_: number, item: Appointment): number | string {
+  trackByRecordId(_index: number, item: MedicalRecord): number {
     return item.id;
-  }
-
-  private getAppointmentTime(appointment: Appointment): number {
-    const fecha = appointment.fecha ?? '';
-    const hora = appointment.hora_inicio ?? '00:00:00';
-    return new Date(`${fecha}T${hora}`).getTime();
-  }
-
-  private buildPatientName(appointment: Appointment | null): string {
-    if (!appointment) return 'Paciente sin nombre';
-
-    const fullName = `${appointment.paciente_nombre ?? ''} ${appointment.paciente_apellidos ?? ''}`.trim();
-    return fullName || 'Paciente sin nombre';
-  }
-
-  private buildDoctorName(appointment: Appointment): string {
-    return `${appointment.doctor_nombre ?? ''} ${appointment.doctor_apellidos ?? ''}`.trim();
   }
 }

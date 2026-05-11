@@ -14,6 +14,8 @@ import { MedicoDashboardComponent as MedicoDashboardComponent } from './screens/
 import { CitasHoy } from './screens/medico/citas-hoy/citas-hoy';
 import { ProximasCitas } from './screens/medico/proximas-citas/proximas-citas';
 import { ExpedientesComponent as MedicoExpedientesComponent } from './screens/medico/expedientes/expedientes';
+import { RegistroConsultaComponent } from './screens/medico/registro-consulta/registro-consulta';
+import { HistorialPacienteComponent as MedicoHistorialPacienteComponent } from './screens/medico/historial-paciente/historial-paciente';
 
 import { AdminDashboardComponent as AdminDashboardComponent } from './screens/admin/dashboard/dashboard';
 import { GestionMedicos } from './screens/admin/gestion-medicos/gestion-medicos';
@@ -21,6 +23,7 @@ import { GestionConsultorios } from './screens/admin/gestion-consultorios/gestio
 import { ReportesComponent as AdminReportesComponent } from './screens/admin/reportes/reportes';
 import { ExpedientesAdminComponent as AdminExpedientesComponent } from './screens/admin/expedientes/expedientes';
 import { HorariosMedicosComponent } from './screens/admin/horarios-medicos/horarios-medicos';
+import { HistorialPacienteComponent as AdminHistorialPacienteComponent } from './screens/admin/historial-paciente/historial-paciente';
 
 import { authGuard } from './core/guards/auth.guard';
 import { roleGuard } from './core/guards/role.guard';
@@ -77,6 +80,8 @@ export const routes: Routes = [
           )
       },
       { path: 'expedientes', component: MedicoExpedientesComponent },
+      { path: 'registro-consulta/:appointmentId', component: RegistroConsultaComponent },
+      { path: 'historial-paciente/:patientId', component: MedicoHistorialPacienteComponent },
       { path: '', redirectTo: 'dashboard', pathMatch: 'full' }
     ]
   },
@@ -95,6 +100,7 @@ export const routes: Routes = [
       { path: 'gestion-consultorios', component: GestionConsultorios },
       { path: 'reportes', component: AdminReportesComponent },
       { path: 'expedientes', component: AdminExpedientesComponent },
+      { path: 'historial-paciente/:patientId', component: AdminHistorialPacienteComponent },
       {
         path: 'citas',
         loadComponent: () =>

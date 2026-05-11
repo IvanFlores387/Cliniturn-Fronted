@@ -7,11 +7,13 @@
 
   <header class="page-header">
     <div>
-      <h1>Expedientes de Pacientes</h1>
-      <p>Consulta el historial de atención de tus pacientes basado en citas registradas.</p>
+      <h1>Expedientes clínicos</h1>
+      <p>
+        Consulta pacientes que ya atendiste o que tienes asignados con cita confirmada.
+      </p>
     </div>
 
-    <button type="button" class="btn-primary" (click)="loadAppointments()">
+    <button type="button" class="btn-primary" (click)="loadRecords()">
       Recargar
     </button>
   </header>
@@ -23,13 +25,8 @@
     </article>
 
     <article class="stat-card success">
-      <span>Con atenciones</span>
-      <strong>{{ totalAtendidos() }}</strong>
-    </article>
-
-    <article class="stat-card warning">
-      <span>Con pendientes</span>
-      <strong>{{ totalConPendientes() }}</strong>
+      <span>Consultas registradas</span>
+      <strong>{{ totalConsultas() }}</strong>
     </article>
   </div>
 
@@ -37,7 +34,7 @@
     <aside class="patients-card">
       <div class="panel-header">
         <h2>Pacientes</h2>
-        <p>Selecciona un paciente para revisar su historial.</p>
+        <p>Busca por nombre, matrícula o médico.</p>
       </div>
 
       <div class="filters-stack">
@@ -47,45 +44,52 @@
             id="search"
             type="text"
             [(ngModel)]="search"
-            placeholder="Nombre, especialidad o consultorio"
+            placeholder="Ej. Juan Pérez, matrícula o médico"
           />
         </div>
 
-        <div class="form-group">
-          <label for="estadoFiltro">Estado</label>
-          <select id="estadoFiltro" [(ngModel)]="estadoFiltro">
-            <option value="">Todos</option>
-            <option value="pendiente">Pendiente</option>
-            <option value="confirmada">Confirmada</option>
-            <option value="cancelada">Cancelada</option>
-            <option value="atendida">Atendida</option>
-          </select>
-        </div>
+        <div class="filter-actions">
+          <button type="button" class="btn-primary" (click)="loadRecords()">
+            Buscar
+          </button>
 
-        <button type="button" class="btn-outline" (click)="clearFilters()">
-          Limpiar filtros
-        </button>
+          <button type="button" class="btn-outline" (click)="clearFilters()">
+            Limpiar
+          </button>
+        </div>
       </div>
 
       <div *ngIf="loading()" class="state-box">
         Cargando expedientes...
       </div>
 
-      <div *ngIf="!loading() && !patientRecords().length" class="state-box empty">
-        No hay pacientes disponibles con los filtros actuales.
+      <div
+        *ngIf="!loading() && !filteredRecords().length"
+        class="state-box empty"
+      >
+        Aún no hay expedientes clínicos disponibles.
       </div>
 
-      <div class="patient-list" *ngIf="!loading() && patientRecords().length">
+      <div
+        class="patient-list"
+        *ngIf="!loading() && filteredRecords().length"
+      >
         <button
           type="button"
           class="patient-item"
-          *ngFor="let record of patientRecords(); trackBy: trackByPatientKey"
-          [class.active]="selectedPatientKey() === record.patientKey"
-          (click)="selectPatient(record)"
+          *ngFor="let record of filteredRecords(); trackBy: trackByRecordId"
+          [class.active]="selectedRecordId() === record.id"
+          (click)="selectRecord(record)"
         >
-          <strong>{{ record.patientName }}</strong>
-          <span>{{ record.totalAppointments }} cita(s)</span>
-          <small>{{ record.specialtyNames.join(', ') || 'Sin especialidades registradas' }}</small>
+          <strong>{{ patientName(record) }}</strong>
+
+          <span>
+            {{ record.paciente_matricula || 'Sin matrícula' }}
+          </span>
+
+          <small>
+            {{ record.total_consultations || 0 }} consulta(s)
+          </small>
         </button>
       </div>
     </aside>
@@ -93,7 +97,7 @@
     <section class="detail-card">
       <div class="panel-header">
         <h2>Detalle del expediente</h2>
-        <p>Resumen clínico operativo a partir del historial de citas.</p>
+        <p>Resumen del historial clínico guardado en la API.</p>
       </div>
 
       <div *ngIf="!selectedRecord()" class="state-box empty">
@@ -103,83 +107,58 @@
       <ng-container *ngIf="selectedRecord() as record">
         <div class="patient-summary">
           <div class="summary-main">
-            <h3>{{ record.patientName }}</h3>
-            <p>{{ record.specialtyNames.join(', ') || 'Sin especialidades registradas' }}</p>
+            <h3>{{ patientName(record) }}</h3>
+
+            <p>
+              Matrícula/ID:
+              {{ record.paciente_matricula || record.paciente_id }}
+            </p>
           </div>
 
           <div class="summary-badges">
-            <span class="badge">{{ record.totalAppointments }} citas</span>
-            <span class="badge success">{{ record.attendedAppointments }} atendidas</span>
-            <span class="badge warning">{{ record.pendingAppointments }} pendientes</span>
+            <span class="badge">
+              {{ record.total_consultations || 0 }} consultas
+            </span>
+
+            <span class="badge success">
+              Última: {{ formatDate(record.last_consultation_date) }}
+            </span>
           </div>
         </div>
 
         <div class="summary-grid">
           <article class="summary-box">
-            <span>Última cita</span>
+            <span>Último diagnóstico</span>
             <strong>
-              {{
-                record.lastAppointment
-                  ? (record.lastAppointment.fecha + ' · ' + formatTime(record.lastAppointment.hora_inicio))
-                  : 'Sin registro'
-              }}
+              {{ record.last_diagnosis || 'Sin diagnóstico registrado' }}
             </strong>
           </article>
 
           <article class="summary-box">
-            <span>Próxima cita</span>
+            <span>Último tratamiento</span>
             <strong>
-              {{
-                record.nextAppointment
-                  ? (record.nextAppointment.fecha + ' · ' + formatTime(record.nextAppointment.hora_inicio))
-                  : 'Sin próxima cita'
-              }}
+              {{ record.last_treatment || 'Sin tratamiento registrado' }}
             </strong>
           </article>
 
           <article class="summary-box">
-            <span>Confirmadas</span>
-            <strong>{{ record.confirmedAppointments }}</strong>
-          </article>
-
-          <article class="summary-box">
-            <span>Canceladas</span>
-            <strong>{{ record.cancelledAppointments }}</strong>
+            <span>Médico responsable</span>
+            <strong>
+              {{
+                ((record.last_doctor_nombre || '') + ' ' + (record.last_doctor_apellidos || '')).trim()
+                  || 'Sin médico'
+              }}
+            </strong>
           </article>
         </div>
 
-        <div class="history-header">
-          <h3>Historial de citas</h3>
-          <p>Últimos movimientos del paciente con este médico.</p>
-        </div>
-
-        <div class="history-list">
-          <article
-            class="history-item"
-            *ngFor="let item of record.appointments; trackBy: trackByAppointmentId"
+        <div class="actions-row">
+          <a
+            class="btn-primary"
+            [routerLink]="['/medico/historial-paciente', record.paciente_id]"
           >
-            <div class="history-top">
-              <div>
-                <strong>{{ item.specialty_nombre || 'Consulta médica' }}</strong>
-                <p>{{ item.fecha }} · {{ formatTime(item.hora_inicio) }} - {{ formatTime(item.hora_fin) }}</p>
-                <small>{{ item.consultorio_nombre || 'Sin consultorio' }}</small>
-              </div>
-
-              <app-appointment-status-chip [status]="item.estado"></app-appointment-status-chip>
-            </div>
-
-            <div class="history-body">
-              <div class="info-row">
-                <span class="label">Motivo</span>
-                <p>{{ item.motivo_consulta }}</p>
-              </div>
-
-              <div class="info-row" *ngIf="item.estado === 'cancelada' && item.notas_cancelacion">
-                <span class="label">Nota de cancelación</span>
-                <p>{{ item.notas_cancelacion }}</p>
-              </div>
-            </div>
-          </article>
+            Ver historial completo
+          </a>
         </div>
       </ng-container>
     </section>

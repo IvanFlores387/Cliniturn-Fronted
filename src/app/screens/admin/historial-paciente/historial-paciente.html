@@ -1,19 +1,15 @@
 <section class="clinical-page">
-  <div class="breadcrumb"><span>Inicio</span><span class="separator">›</span><span class="current">Mi historial</span></div>
+  <div class="breadcrumb"><span>Inicio</span><span class="separator">›</span><span>Expedientes</span><span class="separator">›</span><span class="current">Historial</span></div>
 
   <header class="page-header">
     <div>
-      <h1>Mi historial clínico</h1>
-      <p>Resumen de consultas registradas por tus médicos.</p>
+      <h1>Historial clínico</h1>
+      <p>Consultas, diagnósticos y tratamientos registrados para el paciente.</p>
     </div>
-    <button type="button" class="btn-primary" (click)="loadMyRecord()">Recargar</button>
+    <a class="btn-outline" routerLink="/admin/expedientes">Volver</a>
   </header>
 
-  <div *ngIf="loading()" class="state-box">Cargando historial...</div>
-
-  <div *ngIf="!loading() && !record()" class="state-box empty">
-    Todavía no tienes consultas atendidas registradas en el sistema.
-  </div>
+  <div *ngIf="loading()" class="state-box">Cargando historial clínico...</div>
 
   <ng-container *ngIf="!loading() && record() as recordData">
     <section class="patient-header-card">
@@ -28,18 +24,25 @@
       </div>
     </section>
 
+    <div *ngIf="!recordData.consultations?.length" class="state-box empty">Este paciente aún no tiene consultas registradas.</div>
+
     <div class="timeline" *ngIf="recordData.consultations?.length">
       <article class="timeline-item" *ngFor="let item of recordData.consultations; trackBy: trackByConsultationId">
         <div class="timeline-top">
           <div>
             <h3>{{ item.specialty_nombre || 'Consulta médica' }}</h3>
-            <p>{{ formatDate(item.consultation_date) }} · Dr(a). {{ item.doctor_nombre }} {{ item.doctor_apellidos }}</p>
+            <p>{{ formatDate(item.consultation_date) }} · {{ item.consultorio_nombre || 'Sin consultorio' }}</p>
+            <small>Médico: {{ item.doctor_nombre }} {{ item.doctor_apellidos }}</small>
           </div>
           <span class="status">{{ item.appointment_estado || 'atendida' }}</span>
         </div>
+
         <div class="clinical-grid">
+          <div><span class="label">Motivo</span><p>{{ item.motivo_consulta || 'Sin motivo registrado' }}</p></div>
           <div><span class="label">Diagnóstico</span><p>{{ item.diagnosis }}</p></div>
           <div><span class="label">Tratamiento</span><p>{{ item.treatment }}</p></div>
+          <div><span class="label">Signos vitales</span><p>{{ vitalSignsText(item) }}</p></div>
+          <div class="full"><span class="label">Observaciones</span><p>{{ item.observations || 'Sin observaciones' }}</p></div>
           <div class="full"><span class="label">Indicaciones</span><p>{{ item.general_indications || 'Sin indicaciones generales' }}</p></div>
         </div>
       </article>

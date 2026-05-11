@@ -39,6 +39,13 @@ export class AppointmentsService {
     );
   }
 
+
+  getById(id: number): Observable<Appointment> {
+    return this.http.get<{ ok: boolean; data: Appointment }>(`${this.apiUrl}/${id}`).pipe(
+      map(res => res.data)
+    );
+  }
+
   getDoctorAppointments(): Observable<Appointment[]> {
     return this.http.get<{ ok: boolean; data: Appointment[] }>(`${this.apiUrl}/doctor`).pipe(
       map(res => res.data),

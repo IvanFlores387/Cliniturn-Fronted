@@ -1,0 +1,80 @@
+<section class="clinical-page">
+  <div class="breadcrumb"><span>Inicio</span><span class="separator">›</span><span>Mis Citas</span><span class="separator">›</span><span class="current">Registrar consulta</span></div>
+
+  <header class="page-header">
+    <div>
+      <h1>Registro de consulta médica</h1>
+      <p>Captura diagnóstico, tratamiento, observaciones y signos vitales básicos.</p>
+    </div>
+    <a class="btn-outline" routerLink="/medico/mis-citas">Volver</a>
+  </header>
+
+  <div *ngIf="loading()" class="state-box">Cargando datos de la cita...</div>
+
+  <ng-container *ngIf="!loading() && appointment() as item">
+    <section class="appointment-summary">
+      <div>
+        <span class="label">Paciente</span>
+        <strong>{{ patientName() }}</strong>
+      </div>
+      <div>
+        <span class="label">Fecha y hora</span>
+        <strong>{{ item.fecha }} · {{ formatTime(item.hora_inicio) }} - {{ formatTime(item.hora_fin) }}</strong>
+      </div>
+      <div>
+        <span class="label">Estado</span>
+        <strong>{{ item.estado }}</strong>
+      </div>
+      <div class="full">
+        <span class="label">Motivo de consulta</span>
+        <p>{{ item.motivo_consulta }}</p>
+      </div>
+    </section>
+
+    <div *ngIf="hasExistingConsultation()" class="alert-box">
+      Esta cita ya tiene consulta registrada. El formulario se muestra solo como referencia.
+    </div>
+
+    <form class="clinical-form" [formGroup]="form" (ngSubmit)="save()">
+      <div class="form-grid">
+        <div class="form-group full">
+          <label for="diagnosis">Diagnóstico *</label>
+          <textarea id="diagnosis" rows="4" formControlName="diagnosis" placeholder="Describe el diagnóstico del paciente"></textarea>
+          <small *ngIf="form.controls.diagnosis.touched && form.controls.diagnosis.invalid">El diagnóstico es obligatorio.</small>
+        </div>
+
+        <div class="form-group full">
+          <label for="treatment">Tratamiento *</label>
+          <textarea id="treatment" rows="4" formControlName="treatment" placeholder="Indica tratamiento recomendado"></textarea>
+          <small *ngIf="form.controls.treatment.touched && form.controls.treatment.invalid">El tratamiento es obligatorio.</small>
+        </div>
+
+        <div class="form-group full">
+          <label for="observations">Observaciones</label>
+          <textarea id="observations" rows="3" formControlName="observations" placeholder="Observaciones clínicas adicionales"></textarea>
+        </div>
+
+        <div class="form-group full">
+          <label for="general_indications">Indicaciones generales</label>
+          <textarea id="general_indications" rows="3" formControlName="general_indications" placeholder="Reposo, cuidados, seguimiento, estudios, etc."></textarea>
+        </div>
+      </div>
+
+      <h2>Signos vitales opcionales</h2>
+      <div class="vitals-grid">
+        <div class="form-group"><label>Peso</label><input type="text" formControlName="peso" placeholder="70 kg" /></div>
+        <div class="form-group"><label>Talla</label><input type="text" formControlName="talla" placeholder="1.70 m" /></div>
+        <div class="form-group"><label>Presión arterial</label><input type="text" formControlName="presion_arterial" placeholder="120/80" /></div>
+        <div class="form-group"><label>Temperatura</label><input type="text" formControlName="temperatura" placeholder="36.5 °C" /></div>
+        <div class="form-group"><label>F. cardiaca</label><input type="text" formControlName="frecuencia_cardiaca" placeholder="72 lpm" /></div>
+        <div class="form-group"><label>F. respiratoria</label><input type="text" formControlName="frecuencia_respiratoria" placeholder="18 rpm" /></div>
+      </div>
+
+      <div class="form-actions">
+        <button type="submit" class="btn-primary" [disabled]="saving() || hasExistingConsultation()">
+          {{ saving() ? 'Guardando...' : 'Guardar consulta' }}
+        </button>
+      </div>
+    </form>
+  </ng-container>
+</section>
