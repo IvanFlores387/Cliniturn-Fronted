@@ -55,6 +55,7 @@ export const routes: Routes = [
           )
       },
       { path: 'expediente', component: PacienteExpedienteComponent },
+      { path: 'historial', component: PacienteExpedienteComponent },
       { path: 'estadisticas', component: Estadisticas },
       { path: '', redirectTo: 'dashboard', pathMatch: 'full' }
     ]

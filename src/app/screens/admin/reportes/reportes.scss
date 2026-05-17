@@ -5,32 +5,59 @@
 .reports-page {
   max-width: 1320px;
   margin: 0 auto;
+  color: #0f172a;
 }
+
+/* =========================
+   Breadcrumb
+========================= */
 
 .breadcrumb {
   display: flex;
-  align-items: center;
   gap: 0.5rem;
+  align-items: center;
   color: #64748b;
   font-size: 0.9rem;
   margin-bottom: 1rem;
 
   .separator {
-    color: #94a3b8;
+    color: #2563eb;
+    font-weight: 800;
   }
 
   .current {
-    color: #0f172a;
-    font-weight: 600;
+    color: #2563eb;
+    font-weight: 800;
   }
 }
+
+/* =========================
+   Base cards
+========================= */
+
+.page-header,
+.filters-card,
+.summary-card,
+.highlight-card,
+.panel-card,
+.state-box {
+  background: #fff;
+  border: 1px solid #e2e8f0;
+  border-radius: 22px;
+  box-shadow: 0 18px 45px rgba(15, 23, 42, 0.07);
+}
+
+/* =========================
+   Header
+========================= */
 
 .page-header {
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
   gap: 1rem;
-  margin-bottom: 1.4rem;
+  padding: 1.35rem;
+  margin-bottom: 1rem;
 
   h1 {
     margin: 0;
@@ -45,59 +72,161 @@
   }
 }
 
-.btn-primary {
-  border: none;
+/* =========================
+   Buttons
+========================= */
+
+.btn-primary,
+.btn-outline {
   border-radius: 14px;
-  padding: 0.92rem 1.1rem;
+  padding: 0.9rem 1.05rem;
   font: inherit;
-  font-weight: 700;
+  font-weight: 800;
   cursor: pointer;
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease,
+    background 0.2s ease,
+    border-color 0.2s ease;
+}
+
+.btn-primary {
+  border: 0;
   background: #1d4ed8;
   color: #fff;
+  box-shadow: 0 12px 26px rgba(29, 78, 216, 0.22);
+
+  &:hover {
+    background: #1e40af;
+    transform: translateY(-1px);
+    box-shadow: 0 16px 32px rgba(29, 78, 216, 0.28);
+  }
 }
+
+.btn-outline {
+  border: 1px solid #cbd5e1;
+  background: #fff;
+  color: #334155;
+
+  &:hover {
+    border-color: #2563eb;
+    color: #1d4ed8;
+    transform: translateY(-1px);
+  }
+}
+
+/* =========================
+   Filters
+========================= */
+
+.filters-card {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1rem;
+  align-items: end;
+  padding: 1rem;
+  margin-bottom: 1rem;
+}
+
+.form-group {
+  label {
+    display: block;
+    margin-bottom: 0.4rem;
+    color: #334155;
+    font-weight: 800;
+  }
+
+  input {
+    width: 100%;
+    box-sizing: border-box;
+    border: 1px solid #cbd5e1;
+    border-radius: 14px;
+    padding: 0.85rem 0.95rem;
+    background: #f8fafc;
+    color: #0f172a;
+    font: inherit;
+    outline: none;
+    transition:
+      border-color 0.2s ease,
+      box-shadow 0.2s ease,
+      background 0.2s ease;
+
+    &:focus {
+      border-color: #2563eb;
+      background: #fff;
+      box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.12);
+    }
+  }
+}
+
+.filter-actions {
+  display: flex;
+  gap: 0.7rem;
+  flex-wrap: wrap;
+}
+
+/* =========================
+   Grids
+========================= */
 
 .summary-grid,
 .content-grid,
-.bottom-grid {
+.bottom-grid,
+.highlight-grid {
   display: grid;
   gap: 1rem;
 }
 
 .summary-grid {
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  margin-bottom: 1rem;
+}
+
+.highlight-grid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   margin-bottom: 1rem;
 }
 
 .content-grid {
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   margin-bottom: 1rem;
 }
 
 .bottom-grid {
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  margin-bottom: 1rem;
 }
 
-.summary-card,
-.panel-card,
-.state-box {
-  background: #fff;
-  border: 1px solid #e5e7eb;
-  border-radius: 20px;
-  box-shadow: 0 10px 30px rgba(15, 23, 42, 0.05);
-}
+/* =========================
+   Summary cards
+========================= */
 
 .summary-card {
   padding: 1rem 1.1rem;
+  position: relative;
+  overflow: hidden;
+
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 0 auto 0 0;
+    width: 5px;
+    background: #2563eb;
+  }
 
   span {
     display: block;
     color: #64748b;
-    margin-bottom: 0.45rem;
+    font-size: 0.86rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
   }
 
   strong {
     display: block;
-    font-size: 1.9rem;
+    margin-top: 0.35rem;
+    font-size: 2rem;
     color: #0f172a;
     line-height: 1;
   }
@@ -108,18 +237,90 @@
     color: #64748b;
   }
 
-  &.success strong {
-    color: #15803d;
+  &.warning {
+    border-color: #fde68a;
+
+    &::before {
+      background: #f59e0b;
+    }
+
+    strong {
+      color: #b45309;
+    }
   }
 
-  &.danger strong {
-    color: #dc2626;
+  &.success {
+    border-color: #86efac;
+
+    &::before {
+      background: #16a34a;
+    }
+
+    strong {
+      color: #15803d;
+    }
   }
 
-  &.info strong {
-    color: #1d4ed8;
+  &.done,
+  &.info {
+    border-color: #67e8f9;
+
+    &::before {
+      background: #0891b2;
+    }
+
+    strong {
+      color: #0e7490;
+    }
+  }
+
+  &.danger {
+    border-color: #fecaca;
+
+    &::before {
+      background: #dc2626;
+    }
+
+    strong {
+      color: #dc2626;
+    }
   }
 }
+
+/* =========================
+   Highlight cards
+========================= */
+
+.highlight-card {
+  padding: 1.1rem;
+
+  span {
+    display: block;
+    color: #64748b;
+    font-size: 0.86rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+
+  strong {
+    display: block;
+    margin-top: 0.45rem;
+    color: #0f172a;
+    font-size: 1.25rem;
+    line-height: 1.25;
+  }
+
+  p {
+    margin: 0.55rem 0 0;
+    color: #64748b;
+    line-height: 1.45;
+  }
+}
+
+/* =========================
+   Panels
+========================= */
 
 .panel-card {
   padding: 1.2rem;
@@ -146,8 +347,131 @@
 
   &.empty {
     color: #64748b;
+    background: #f8fafc;
+    box-shadow: none;
   }
 }
+
+/* =========================
+   Horizontal bars
+========================= */
+
+.bar-list {
+  display: flex;
+  flex-direction: column;
+}
+
+.bar-row {
+  display: grid;
+  grid-template-columns: minmax(140px, 220px) 1fr;
+  gap: 1rem;
+  align-items: center;
+  padding: 0.85rem 0;
+  border-bottom: 1px solid #eef2f7;
+
+  &:last-child {
+    border-bottom: 0;
+  }
+}
+
+.bar-info {
+  strong {
+    display: block;
+    color: #0f172a;
+  }
+
+  span {
+    display: block;
+    margin-top: 0.2rem;
+    color: #64748b;
+    font-size: 0.9rem;
+  }
+}
+
+.bar-track {
+  border-radius: 999px;
+  background: #e2e8f0;
+  overflow: hidden;
+
+  &.horizontal {
+    height: 12px;
+  }
+}
+
+.bar-fill-horizontal,
+.bar-track span {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, #1d4ed8, #38bdf8);
+}
+
+.monthly-fill {
+  background: linear-gradient(90deg, #2563eb, #60a5fa);
+}
+
+/* =========================
+   Previous vertical charts support
+   Por si aún usas weeklyTrend/monthlyTrend
+========================= */
+
+.bars-grid {
+  min-height: 260px;
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 0.9rem;
+  align-items: end;
+
+  &.monthly {
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+  }
+}
+
+.bar-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.45rem;
+
+  small {
+    color: #64748b;
+    text-align: center;
+    line-height: 1.35;
+  }
+}
+
+.bar-value {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.bars-grid .bar-track {
+  width: 100%;
+  height: 190px;
+  background: #f8fafc;
+  border: 1px solid #eef2f7;
+  border-radius: 16px;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  padding: 0.5rem;
+}
+
+.bar-fill {
+  width: 100%;
+  border-radius: 12px;
+  background: linear-gradient(180deg, #3f7ce0 0%, #2746b3 100%);
+}
+
+.bars-grid .monthly-fill {
+  background: linear-gradient(180deg, #60a5fa 0%, #2563eb 100%);
+}
+
+/* =========================
+   Previous pie chart support
+   Por si aún usas specialtyDistribution
+========================= */
 
 .pie-layout {
   display: grid;
@@ -210,65 +534,30 @@
   height: 14px;
   border-radius: 50%;
 
-  &.dot-0 { background: #2746b3; }
-  &.dot-1 { background: #3f7ce0; }
-  &.dot-2 { background: #6097e6; }
-  &.dot-3 { background: #86b2ef; }
-  &.dot-4 { background: #adcaf6; }
+  &.dot-0 {
+    background: #2746b3;
+  }
+
+  &.dot-1 {
+    background: #3f7ce0;
+  }
+
+  &.dot-2 {
+    background: #6097e6;
+  }
+
+  &.dot-3 {
+    background: #86b2ef;
+  }
+
+  &.dot-4 {
+    background: #adcaf6;
+  }
 }
 
-.bars-grid {
-  min-height: 260px;
-  display: grid;
-  grid-template-columns: repeat(7, minmax(0, 1fr));
-  gap: 0.9rem;
-  align-items: end;
-}
-
-.bars-grid.monthly {
-  grid-template-columns: repeat(6, minmax(0, 1fr));
-}
-
-.bar-item {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 0.45rem;
-}
-
-.bar-value {
-  font-size: 0.9rem;
-  font-weight: 700;
-  color: #0f172a;
-}
-
-.bar-track {
-  width: 100%;
-  height: 190px;
-  background: #f8fafc;
-  border: 1px solid #eef2f7;
-  border-radius: 16px;
-  display: flex;
-  align-items: flex-end;
-  justify-content: center;
-  padding: 0.5rem;
-}
-
-.bar-fill {
-  width: 100%;
-  border-radius: 12px;
-  background: linear-gradient(180deg, #3f7ce0 0%, #2746b3 100%);
-}
-
-.monthly-fill {
-  background: linear-gradient(180deg, #60a5fa 0%, #2563eb 100%);
-}
-
-.bar-item small {
-  color: #64748b;
-  text-align: center;
-  line-height: 1.35;
-}
+/* =========================
+   Status list
+========================= */
 
 .status-list {
   display: flex;
@@ -318,6 +607,7 @@
     }
   }
 
+  &.done,
   &.info {
     background: #eff6ff;
     border-color: #bfdbfe;
@@ -336,6 +626,10 @@
     }
   }
 }
+
+/* =========================
+   Executive summary
+========================= */
 
 .executive-list {
   display: flex;
@@ -362,6 +656,10 @@
   }
 }
 
+/* =========================
+   Recommendations
+========================= */
+
 .success-panel {
   background: #f0fdf4;
   border-color: #bbf7d0;
@@ -375,8 +673,70 @@
     margin-bottom: 0.8rem;
     color: #14532d;
     line-height: 1.55;
+
+    &:last-child {
+      margin-bottom: 0;
+    }
   }
 }
+
+/* =========================
+   Table
+========================= */
+
+.table-panel {
+  margin-bottom: 1rem;
+}
+
+.table-responsive {
+  width: 100%;
+  overflow-x: auto;
+  border-radius: 16px;
+  border: 1px solid #e2e8f0;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 780px;
+  background: #fff;
+}
+
+th,
+td {
+  padding: 0.9rem;
+  text-align: left;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+th {
+  color: #475569;
+  font-size: 0.82rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  background: #f8fafc;
+  font-weight: 800;
+}
+
+td {
+  color: #334155;
+}
+
+tbody tr {
+  transition: background 0.2s ease;
+
+  &:hover {
+    background: #f8fafc;
+  }
+
+  &:last-child td {
+    border-bottom: 0;
+  }
+}
+
+/* =========================
+   Responsive
+========================= */
 
 @media (max-width: 1200px) {
   .summary-grid {
@@ -385,13 +745,29 @@
 
   .content-grid,
   .bottom-grid,
+  .highlight-grid,
   .pie-layout {
     grid-template-columns: 1fr;
   }
 }
 
+@media (max-width: 900px) {
+  .filters-card {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .filter-actions {
+    grid-column: 1 / -1;
+  }
+}
+
 @media (max-width: 768px) {
+  .reports-page {
+    padding: 0;
+  }
+
   .page-header,
+  .filter-actions,
   .exec-row,
   .legend-item,
   .status-item {
@@ -399,7 +775,26 @@
     align-items: stretch;
   }
 
-  .summary-grid {
+  .page-header {
+    padding: 1.1rem;
+
+    h1 {
+      font-size: 1.85rem;
+    }
+  }
+
+  .filters-card,
+  .summary-grid,
+  .highlight-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .content-grid,
+  .bottom-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .bar-row {
     grid-template-columns: 1fr;
   }
 
@@ -408,12 +803,47 @@
     grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 
-  .btn-primary {
+  .btn-primary,
+  .btn-outline {
     width: 100%;
   }
 
   .pie-chart {
     width: 220px;
     height: 220px;
+  }
+
+  .summary-card strong {
+    font-size: 1.8rem;
+  }
+
+  .exec-row strong {
+    text-align: left;
+  }
+}
+
+@media (max-width: 480px) {
+  .page-header,
+  .filters-card,
+  .summary-card,
+  .highlight-card,
+  .panel-card,
+  .state-box {
+    border-radius: 18px;
+  }
+
+  .bars-grid,
+  .bars-grid.monthly {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .pie-chart {
+    width: 190px;
+    height: 190px;
+  }
+
+  th,
+  td {
+    padding: 0.75rem;
   }
 }

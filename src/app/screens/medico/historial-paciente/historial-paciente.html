@@ -3,31 +3,62 @@
 
   <header class="page-header">
     <div>
-      <h1>Historial clínico</h1>
-      <p>Consultas, diagnósticos y tratamientos registrados para el paciente.</p>
+      <h1>Historial clínico completo</h1>
+      <p>Consultas, diagnósticos, tratamientos, signos vitales y citas anteriores.</p>
     </div>
-    <a class="btn-outline" routerLink="/medico/expedientes">Volver</a>
+    <a class="btn-outline" routerLink="../..">Volver</a>
   </header>
 
   <div *ngIf="loading()" class="state-box">Cargando historial clínico...</div>
 
-  <ng-container *ngIf="!loading() && record() as recordData">
+  <ng-container *ngIf="!loading() && history() as historyData">
     <section class="patient-header-card">
       <div>
         <span class="label">Paciente</span>
         <h2>{{ patientName() }}</h2>
-        <p>Matrícula/ID: {{ recordData.paciente_matricula || recordData.paciente_id }}</p>
+        <p>Matrícula/ID: {{ historyData.patient.paciente_matricula || historyData.patient.paciente_id }}</p>
+        <p>{{ historyData.patient.paciente_email || 'Sin correo' }} · {{ historyData.patient.paciente_telefono || 'Sin teléfono' }}</p>
       </div>
       <div class="summary-badges">
-        <span class="badge">{{ recordData.total_consultations || 0 }} consultas</span>
-        <span class="badge success">Última: {{ formatDate(recordData.last_consultation_date) }}</span>
+        <span class="badge">{{ historyData.summary.total_appointments }} citas</span>
+        <span class="badge success">{{ historyData.summary.total_consultations }} consultas</span>
+        <span class="badge">Última: {{ formatDate(historyData.summary.last_consultation_date) }}</span>
       </div>
     </section>
 
-    <div *ngIf="!recordData.consultations?.length" class="state-box empty">Este paciente aún no tiene consultas registradas.</div>
+    <section class="panel-card">
+      <div class="panel-header">
+        <h2>Citas anteriores</h2>
+        <p>Registro cronológico de citas del paciente.</p>
+      </div>
 
-    <div class="timeline" *ngIf="recordData.consultations?.length">
-      <article class="timeline-item" *ngFor="let item of recordData.consultations; trackBy: trackByConsultationId">
+      <div *ngIf="!historyData.appointments.length" class="state-box empty">Este paciente aún no tiene citas registradas.</div>
+
+      <div class="table-responsive" *ngIf="historyData.appointments.length">
+        <table>
+          <thead>
+            <tr>
+              <th>Fecha</th><th>Médico</th><th>Especialidad</th><th>Motivo</th><th>Estado</th><th>Registro</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let item of historyData.appointments">
+              <td>{{ formatDate(item.fecha) }}</td>
+              <td>{{ item.doctor_nombre }} {{ item.doctor_apellidos }}</td>
+              <td>{{ item.specialty_nombre || 'Sin especialidad' }}</td>
+              <td>{{ item.motivo_consulta || 'Sin motivo' }}</td>
+              <td><span class="status">{{ item.estado }}</span></td>
+              <td>{{ formatDate(item.created_at) }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <div *ngIf="!historyData.consultations.length" class="state-box empty">Este paciente aún no tiene consultas registradas.</div>
+
+    <div class="timeline" *ngIf="historyData.consultations.length">
+      <article class="timeline-item" *ngFor="let item of historyData.consultations; trackBy: trackByConsultationId">
         <div class="timeline-top">
           <div>
             <h3>{{ item.specialty_nombre || 'Consulta médica' }}</h3>

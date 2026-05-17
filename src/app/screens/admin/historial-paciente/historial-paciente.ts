@@ -3,8 +3,9 @@ import { Component, DestroyRef, inject, signal } from '@angular/core';
 import { ActivatedRoute, RouterModule } from '@angular/router';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
-import { MedicalRecord, Consultation } from '../../../core/models/clinical-record.model';
-import { RecordsService } from '../../../services/records.service';
+import { Consultation } from '../../../core/models/clinical-record.model';
+import { MedicalHistory } from '../../../core/models/history.model';
+import { HistoryService } from '../../../services/history.service';
 import { NotificationService } from '../../../services/notification.service';
 
 @Component({
@@ -16,12 +17,12 @@ import { NotificationService } from '../../../services/notification.service';
 })
 export class HistorialPacienteComponent {
   private readonly route = inject(ActivatedRoute);
-  private readonly recordsService = inject(RecordsService);
+  private readonly historyService = inject(HistoryService);
   private readonly notificationService = inject(NotificationService);
   private readonly destroyRef = inject(DestroyRef);
 
   readonly loading = signal(true);
-  readonly record = signal<MedicalRecord | null>(null);
+  readonly history = signal<MedicalHistory | null>(null);
 
   constructor() {
     this.loadHistory();
@@ -32,12 +33,12 @@ export class HistorialPacienteComponent {
     if (!patientId) return;
 
     this.loading.set(true);
-    this.recordsService
-      .getByPatientId(patientId)
+    this.historyService
+      .getPatientHistory(patientId)
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
-        next: (record) => {
-          this.record.set(record);
+        next: (history) => {
+          this.history.set(history);
           this.loading.set(false);
         },
         error: (error) => {
@@ -48,8 +49,8 @@ export class HistorialPacienteComponent {
   }
 
   patientName(): string {
-    const record = this.record();
-    return `${record?.paciente_nombre ?? ''} ${record?.paciente_apellidos ?? ''}`.trim() || 'Paciente';
+    const patient = this.history()?.patient;
+    return `${patient?.paciente_nombre ?? ''} ${patient?.paciente_apellidos ?? ''}`.trim() || 'Paciente';
   }
 
   formatDate(value: string | null | undefined): string {
