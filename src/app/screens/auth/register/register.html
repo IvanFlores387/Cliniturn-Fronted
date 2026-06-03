@@ -6,7 +6,7 @@
         <lucide-icon name="user-plus"></lucide-icon>
       </div>
       <h2>Crear Cuenta</h2>
-      <p>Registrate en CliniTurn</p>
+      <p>Regístrate en CliniTurn</p>
     </div>
 
     <div class="role-tabs">
@@ -35,6 +35,7 @@
     <!-- ================= PACIENTE ================= -->
     <form *ngIf="activeTab === 'paciente'" [formGroup]="pacienteForm" (ngSubmit)="onSubmitPaciente()">
       <div class="form-grid">
+
         <div class="input-group">
           <label for="pac-nombre">Nombre(s) *</label>
           <div class="input-wrapper">
@@ -55,7 +56,7 @@
           <label for="pac-matricula">Matrícula *</label>
           <div class="input-wrapper">
             <lucide-icon name="graduation-cap" class="input-icon"></lucide-icon>
-            <input id="pac-matricula" type="text" formControlName="matricula" placeholder="2021-0123">
+            <input id="pac-matricula" type="text" formControlName="matricula" placeholder="20210123">
           </div>
         </div>
 
@@ -79,7 +80,7 @@
           <label for="pac-telefono">Teléfono *</label>
           <div class="input-wrapper">
             <lucide-icon name="phone" class="input-icon"></lucide-icon>
-            <input id="pac-telefono" type="tel" formControlName="telefono" placeholder="555-1234">
+            <input id="pac-telefono" type="tel" formControlName="telefono" placeholder="5551234567">
           </div>
         </div>
 
@@ -100,8 +101,8 @@
         </div>
       </div>
 
-      <button type="submit" class="btn-primary" [disabled]="pacienteForm.invalid || isSubmitting()">
-        Crear Cuenta de Paciente
+      <button type="submit" class="btn-primary" [disabled]="isSubmitting()">
+        {{ isSubmitting() ? 'Registrando...' : 'Crear Cuenta de Paciente' }}
       </button>
 
       @if (errorMessage()) {
@@ -114,6 +115,7 @@
     <!-- ================= MEDICO ================= -->
     <form *ngIf="activeTab === 'medico'" [formGroup]="medicoForm" (ngSubmit)="onSubmitMedico()">
       <div class="form-grid">
+
         <div class="input-group">
           <label for="med-nombre">Nombre(s) *</label>
           <div class="input-wrapper">
@@ -158,7 +160,7 @@
           <label for="med-telefono">Teléfono *</label>
           <div class="input-wrapper">
             <lucide-icon name="phone" class="input-icon"></lucide-icon>
-            <input id="med-telefono" type="tel" formControlName="telefono" placeholder="555-9876">
+            <input id="med-telefono" type="tel" formControlName="telefono" placeholder="5559876543">
           </div>
         </div>
 
@@ -179,8 +181,8 @@
         </div>
       </div>
 
-      <button type="submit" class="btn-primary" [disabled]="medicoForm.invalid || isSubmitting()">
-        Registrar Médico
+      <button type="submit" class="btn-primary" [disabled]="isSubmitting()">
+        {{ isSubmitting() ? 'Registrando...' : 'Registrar Médico' }}
       </button>
 
       @if (errorMessage()) {
@@ -193,6 +195,7 @@
     <!-- ================= ADMIN ================= -->
     <form *ngIf="activeTab === 'admin'" [formGroup]="adminForm" (ngSubmit)="onSubmitAdmin()">
       <div class="form-grid">
+
         <div class="input-group">
           <label for="adm-nombre">Nombre(s) *</label>
           <div class="input-wrapper">
@@ -221,7 +224,7 @@
           <label for="adm-telefono">Teléfono *</label>
           <div class="input-wrapper">
             <lucide-icon name="phone" class="input-icon"></lucide-icon>
-            <input id="adm-telefono" type="tel" formControlName="telefono" placeholder="555-4321">
+            <input id="adm-telefono" type="tel" formControlName="telefono" placeholder="5554321987">
           </div>
         </div>
 
@@ -250,8 +253,8 @@
         </div>
       </div>
 
-      <button type="submit" class="btn-primary" [disabled]="adminForm.invalid || isSubmitting()">
-        Registrar Administrador
+      <button type="submit" class="btn-primary" [disabled]="isSubmitting()">
+        {{ isSubmitting() ? 'Registrando...' : 'Registrar Administrador' }}
       </button>
 
       @if (errorMessage()) {
@@ -262,8 +265,12 @@
     </form>
 
     <div class="auth-footer">
-      <p>¿Ya tienes una cuenta? <a (click)="goToLogin()">Inicia sesión aquí</a></p>
-      <a class="back-link" (click)="goHome()">← Volver al inicio</a>
+      <p>
+        ¿Ya tienes una cuenta?
+        <a type="button" (click)="goToLogin()">Inicia sesión aquí</a>
+      </p>
+
+      <a type="button" class="back-link" (click)="goHome()">← Volver al inicio</a>
     </div>
 
   </div>

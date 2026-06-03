@@ -49,7 +49,10 @@ function passwordMatchValidator(control: AbstractControl): ValidationErrors | nu
   const password = control.get('password')?.value;
   const confirmPassword = control.get('confirmPassword')?.value;
 
-  if (!password || !confirmPassword) return null;
+  if (!password || !confirmPassword) {
+    return null;
+  }
+
   return password === confirmPassword ? null : { passwordMismatch: true };
 }
 
@@ -104,7 +107,7 @@ export class RegisterComponent implements OnInit {
         nombre: ['', textNameValidators],
         apellidos: ['', textNameValidators],
         matricula: ['', [Validators.required, Validators.minLength(3), Validators.maxLength(30)]],
-        carrera: ['', [Validators.required, Validators.minLength(3), Validators.maxLength(120)]],
+        carrera: ['', [Validators.required, Validators.minLength(3), Validators.maxLength(150)]],
         correo: ['', emailValidators],
         telefono: ['', phoneValidators],
         password: ['', passwordValidators],
@@ -144,11 +147,13 @@ export class RegisterComponent implements OnInit {
   setTab(tab: 'paciente' | 'medico' | 'admin'): void {
     this.activeTab = tab;
     this.errorMessage.set('');
+    this.isSubmitting.set(false);
   }
 
   onSubmitPaciente(): void {
     if (this.pacienteForm.invalid) {
       this.pacienteForm.markAllAsTouched();
+      this.errorMessage.set(this.getFirstFormError(this.pacienteForm));
       return;
     }
 
@@ -183,6 +188,7 @@ export class RegisterComponent implements OnInit {
   onSubmitMedico(): void {
     if (this.medicoForm.invalid) {
       this.medicoForm.markAllAsTouched();
+      this.errorMessage.set(this.getFirstFormError(this.medicoForm));
       return;
     }
 
@@ -217,6 +223,7 @@ export class RegisterComponent implements OnInit {
   onSubmitAdmin(): void {
     if (this.adminForm.invalid) {
       this.adminForm.markAllAsTouched();
+      this.errorMessage.set(this.getFirstFormError(this.adminForm));
       return;
     }
 
@@ -263,5 +270,59 @@ export class RegisterComponent implements OnInit {
     });
 
     return cleanedValue;
+  }
+
+  private getFirstFormError(form: FormGroup): string {
+    if (form.hasError('passwordMismatch')) {
+      return 'Las contraseñas no coinciden.';
+    }
+
+    const fieldLabels: Record<string, string> = {
+      nombre: 'Nombre',
+      apellidos: 'Apellidos',
+      matricula: 'Matrícula',
+      carrera: 'Carrera',
+      correo: 'Correo electrónico',
+      telefono: 'Teléfono',
+      password: 'Contraseña',
+      confirmPassword: 'Confirmar contraseña',
+      cedula: 'Cédula profesional',
+      especialidad: 'Especialidad',
+      codigoAdmin: 'Código de administrador',
+    };
+
+    for (const fieldName of Object.keys(form.controls)) {
+      const control = form.get(fieldName);
+
+      if (!control || control.valid) {
+        continue;
+      }
+
+      const label = fieldLabels[fieldName] || fieldName;
+
+      if (control.hasError('required')) {
+        return `El campo "${label}" es obligatorio.`;
+      }
+
+      if (control.hasError('email')) {
+        return 'Ingresa un correo electrónico válido.';
+      }
+
+      if (control.hasError('minlength')) {
+        const requiredLength = control.errors?.['minlength']?.requiredLength;
+        return `El campo "${label}" debe tener al menos ${requiredLength} caracteres.`;
+      }
+
+      if (control.hasError('maxlength')) {
+        const requiredLength = control.errors?.['maxlength']?.requiredLength;
+        return `El campo "${label}" no debe superar ${requiredLength} caracteres.`;
+      }
+
+      if (control.hasError('pattern')) {
+        return `El formato del campo "${label}" no es válido.`;
+      }
+    }
+
+    return 'Revisa los campos del formulario.';
   }
 }
