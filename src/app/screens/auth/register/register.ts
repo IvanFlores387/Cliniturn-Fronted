@@ -1,10 +1,49 @@
 import { Component, OnInit, inject, signal } from '@angular/core';
-import { FormBuilder, FormGroup, Validators, ReactiveFormsModule, AbstractControl, ValidationErrors } from '@angular/forms';
+import {
+  AbstractControl,
+  FormBuilder,
+  FormGroup,
+  ReactiveFormsModule,
+  ValidationErrors,
+  Validators,
+} from '@angular/forms';
 import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 
 import { IconsModule } from '../../../shared/icons.module';
 import { AuthService } from '../../../services/auth.service';
+
+type PacienteFormValue = {
+  nombre: string;
+  apellidos: string;
+  matricula: string;
+  carrera: string;
+  correo: string;
+  telefono: string;
+  password: string;
+  confirmPassword: string;
+};
+
+type MedicoFormValue = {
+  nombre: string;
+  apellidos: string;
+  cedula: string;
+  especialidad: string;
+  correo: string;
+  telefono: string;
+  password: string;
+  confirmPassword: string;
+};
+
+type AdminFormValue = {
+  nombre: string;
+  apellidos: string;
+  codigoAdmin: string;
+  correo: string;
+  telefono: string;
+  password: string;
+  confirmPassword: string;
+};
 
 function passwordMatchValidator(control: AbstractControl): ValidationErrors | null {
   const password = control.get('password')?.value;
@@ -14,12 +53,36 @@ function passwordMatchValidator(control: AbstractControl): ValidationErrors | nu
   return password === confirmPassword ? null : { passwordMismatch: true };
 }
 
+const textNameValidators = [
+  Validators.required,
+  Validators.minLength(2),
+  Validators.maxLength(120),
+  Validators.pattern(/^[A-Za-zÁÉÍÓÚÜÑáéíóúüñ\s'.-]+$/),
+];
+
+const emailValidators = [
+  Validators.required,
+  Validators.email,
+  Validators.maxLength(150),
+];
+
+const phoneValidators = [
+  Validators.required,
+  Validators.pattern(/^[0-9+()\s.-]{7,20}$/),
+];
+
+const passwordValidators = [
+  Validators.required,
+  Validators.minLength(6),
+  Validators.maxLength(72),
+];
+
 @Component({
   selector: 'app-register',
   standalone: true,
   imports: [CommonModule, ReactiveFormsModule, IconsModule],
   templateUrl: './register.html',
-  styleUrls: ['./register.scss']
+  styleUrls: ['./register.scss'],
 })
 export class RegisterComponent implements OnInit {
   activeTab: 'paciente' | 'medico' | 'admin' = 'paciente';
@@ -38,41 +101,41 @@ export class RegisterComponent implements OnInit {
   ngOnInit(): void {
     this.pacienteForm = this.fb.group(
       {
-        nombre: ['', Validators.required],
-        apellidos: ['', Validators.required],
-        matricula: ['', Validators.required],
-        carrera: ['', Validators.required],
-        correo: ['', [Validators.required, Validators.email]],
-        telefono: ['', Validators.required],
-        password: ['', [Validators.required, Validators.minLength(6)]],
-        confirmPassword: ['', Validators.required]
+        nombre: ['', textNameValidators],
+        apellidos: ['', textNameValidators],
+        matricula: ['', [Validators.required, Validators.minLength(3), Validators.maxLength(30)]],
+        carrera: ['', [Validators.required, Validators.minLength(3), Validators.maxLength(120)]],
+        correo: ['', emailValidators],
+        telefono: ['', phoneValidators],
+        password: ['', passwordValidators],
+        confirmPassword: ['', Validators.required],
       },
       { validators: passwordMatchValidator }
     );
 
     this.medicoForm = this.fb.group(
       {
-        nombre: ['', Validators.required],
-        apellidos: ['', Validators.required],
-        cedula: ['', Validators.required],
-        especialidad: ['', Validators.required],
-        correo: ['', [Validators.required, Validators.email]],
-        telefono: ['', Validators.required],
-        password: ['', [Validators.required, Validators.minLength(6)]],
-        confirmPassword: ['', Validators.required]
+        nombre: ['', textNameValidators],
+        apellidos: ['', textNameValidators],
+        cedula: ['', [Validators.required, Validators.pattern(/^[A-Za-z0-9-]{4,30}$/)]],
+        especialidad: ['', [Validators.required, Validators.minLength(3), Validators.maxLength(100)]],
+        correo: ['', emailValidators],
+        telefono: ['', phoneValidators],
+        password: ['', passwordValidators],
+        confirmPassword: ['', Validators.required],
       },
       { validators: passwordMatchValidator }
     );
 
     this.adminForm = this.fb.group(
       {
-        nombre: ['', Validators.required],
-        apellidos: ['', Validators.required],
-        codigoAdmin: ['', Validators.required],
-        correo: ['', [Validators.required, Validators.email]],
-        telefono: ['', Validators.required],
-        password: ['', [Validators.required, Validators.minLength(6)]],
-        confirmPassword: ['', Validators.required]
+        nombre: ['', textNameValidators],
+        apellidos: ['', textNameValidators],
+        codigoAdmin: ['', [Validators.required, Validators.minLength(4), Validators.maxLength(40)]],
+        correo: ['', emailValidators],
+        telefono: ['', phoneValidators],
+        password: ['', passwordValidators],
+        confirmPassword: ['', Validators.required],
       },
       { validators: passwordMatchValidator }
     );
@@ -92,17 +155,19 @@ export class RegisterComponent implements OnInit {
     this.isSubmitting.set(true);
     this.errorMessage.set('');
 
-    const value = this.pacienteForm.getRawValue();
+    const value = this.cleanFormValue<PacienteFormValue>(
+      this.pacienteForm.getRawValue() as PacienteFormValue
+    );
 
     this.authService.register({
-      nombre: `${value.nombre} ${value.apellidos}`.trim(),
+      nombre: value.nombre,
       email: value.correo,
       password: value.password,
       role: 'paciente',
       telefono: value.telefono,
       apellidos: value.apellidos,
       matricula: value.matricula,
-      carrera: value.carrera
+      carrera: value.carrera,
     }).subscribe({
       next: () => {
         this.isSubmitting.set(false);
@@ -111,7 +176,7 @@ export class RegisterComponent implements OnInit {
       error: (error) => {
         this.isSubmitting.set(false);
         this.errorMessage.set(error?.error?.message || 'No se pudo registrar el paciente.');
-      }
+      },
     });
   }
 
@@ -124,17 +189,19 @@ export class RegisterComponent implements OnInit {
     this.isSubmitting.set(true);
     this.errorMessage.set('');
 
-    const value = this.medicoForm.getRawValue();
+    const value = this.cleanFormValue<MedicoFormValue>(
+      this.medicoForm.getRawValue() as MedicoFormValue
+    );
 
     this.authService.register({
-      nombre: `${value.nombre} ${value.apellidos}`.trim(),
+      nombre: value.nombre,
       email: value.correo,
       password: value.password,
       role: 'medico',
       telefono: value.telefono,
       apellidos: value.apellidos,
       cedula: value.cedula,
-      especialidad: value.especialidad
+      especialidad: value.especialidad,
     }).subscribe({
       next: () => {
         this.isSubmitting.set(false);
@@ -143,7 +210,7 @@ export class RegisterComponent implements OnInit {
       error: (error) => {
         this.isSubmitting.set(false);
         this.errorMessage.set(error?.error?.message || 'No se pudo registrar el médico.');
-      }
+      },
     });
   }
 
@@ -156,16 +223,18 @@ export class RegisterComponent implements OnInit {
     this.isSubmitting.set(true);
     this.errorMessage.set('');
 
-    const value = this.adminForm.getRawValue();
+    const value = this.cleanFormValue<AdminFormValue>(
+      this.adminForm.getRawValue() as AdminFormValue
+    );
 
     this.authService.register({
-      nombre: `${value.nombre} ${value.apellidos}`.trim(),
+      nombre: value.nombre,
       email: value.correo,
       password: value.password,
       role: 'admin',
       telefono: value.telefono,
       apellidos: value.apellidos,
-      codigoAdmin: value.codigoAdmin
+      codigoAdmin: value.codigoAdmin,
     }).subscribe({
       next: () => {
         this.isSubmitting.set(false);
@@ -174,7 +243,7 @@ export class RegisterComponent implements OnInit {
       error: (error) => {
         this.isSubmitting.set(false);
         this.errorMessage.set(error?.error?.message || 'No se pudo registrar el administrador.');
-      }
+      },
     });
   }
 
@@ -184,5 +253,15 @@ export class RegisterComponent implements OnInit {
 
   goHome(): void {
     this.router.navigate(['/']);
+  }
+
+  private cleanFormValue<T extends Record<string, string>>(value: T): T {
+    const cleanedValue = { ...value };
+
+    Object.keys(cleanedValue).forEach((key) => {
+      cleanedValue[key as keyof T] = String(cleanedValue[key as keyof T] ?? '').trim() as T[keyof T];
+    });
+
+    return cleanedValue;
   }
 }
